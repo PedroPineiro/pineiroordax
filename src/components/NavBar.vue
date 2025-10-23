@@ -3,7 +3,9 @@
 
     <div class="container-fluid">
       <!-- Marca o logo -->
-      <a class="navbar-brand" href="#">EmpresaTeis</a>
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img src="/logo.svg" alt="Logo Empresa Teis" class="brand-logo me-2">
+      </a>
 
       <!-- Botón de hamburguesa en pantallas pequeñas -->
       <button
@@ -28,7 +30,7 @@
             <router-link class="nav-link" to="/clientes">Clientes</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/#">Noticias</router-link>
+            <router-link class="nav-link" to="/noticias">Noticias</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/#">Modelos</router-link>
@@ -55,6 +57,11 @@
 .navbar-dark .nav-link:hover,
 .navbar-dark .nav-link:focus {
   color: #fff; /* blanco intenso al pasar el ratón */
+}
+.brand-logo{
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
 }
 
 </style>

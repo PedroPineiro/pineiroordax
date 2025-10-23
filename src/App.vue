@@ -12,8 +12,10 @@
 
 <script setup>
 import NavBar from './components/NavBar.vue'
-import FooTer from './components/Footer.vue'
+import FooTer from './components/FooTer.vue'
 import GestionClientes from './components/GestionClientes.vue'
+import NotiCias from './components/NotiCias.vue'
+import PaginaInicio from './components/PaginaInicio.vue'
 </script>
 
 <style scoped>

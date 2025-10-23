@@ -1,0 +1,6 @@
+json noticias.json
+  id - json lo añade
+  titulo extension maxima 128 caracteres
+  contenido max 256 caracteres
+  fechaformato fecha cogida del sistema
+

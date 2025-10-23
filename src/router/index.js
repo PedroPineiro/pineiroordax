@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import GestionClientes from "../components/GestionClientes.vue";
 import NotFound from "../components/NotFound.vue";
 import PaginaInicio from "../components/PaginaInicio.vue";
+import NotiCias from "../components/NotiCias.vue";
 
 const routes = [
   {
@@ -13,6 +14,11 @@ const routes = [
     path: "/clientes",
     name: "GestionClientes",
     component: GestionClientes,
+  },
+  {
+    path: "/noticias",
+    name: "NotiCias",
+    component: NotiCias
   },
   {
     path: "/:pathMatch(.*)*",
