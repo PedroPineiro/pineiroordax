@@ -165,30 +165,29 @@
         </div>
       </div>
 
-      <!-- Histórico -->
-      <div class="d-flex justify-content-end mb-2">
-        <input
-          type="checkbox"
-          id="historico"
-          v-model="mostrarHistorico"
-          class="form-check-input"
-          @change="cargarClientes"
-        />
-        <label for="historico" class="form-check-label ms-3 me-5 mb-0"
-          >Histórico</label
-        >
-      </div>
 
-      <!-- Botón centrado -->
+        <!-- Botón centrado -->
       <div class="text-center">
         <button
           type="submit"
-          class="btn btn-primary border-0 shadow-none rounded-0"
-        >
-          Cargar
+          class="btn btn-primary px-4">
+          {{ editando ? "Modificar Cliente" : "Guardar Cliente" }}
         </button>
       </div>
+
+        <!-- Checkbox al final -->
+        <div class="form-check form-switch ms-3">
+          <input
+            type="checkbox"
+            id="historico"
+            v-model="mostrarHistorico"
+            class="form-check-input"
+            @change="cargarClientes"
+          />
+          <label for="historico" class="form-check-label ms-2">Histórico</label>
+        </div>
     </form>
+    
     <!-- Lista de Clientes -->
     <div class="table-responsive">
       <h4 class="text-center w-100">Listado Clientes</h4>
