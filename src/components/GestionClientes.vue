@@ -10,16 +10,25 @@
         <!-- Columna DNI -->
         <div class="col-md-4 d-flex align-items-center">
           <label for="dni" class="form-label mb-0 w-25">DNI: </label>
-          <div class="flex-grow-1">
-            <input
-              type="text"
-              id="dni"
-              v-model="nuevoCliente.dni"
-              @blur="validarDni"
-              class="form-control w-auto"
-              :class="{ 'is-invalid': !dniValido }"
-              required
-            />
+          <div class="flex-grow-1 d-flex align-items-center">
+                <input
+                  type="text"
+                  id="dni"
+                  v-model="nuevoCliente.dni"
+                  @blur="validarDni"
+                  class="form-control w-auto w-25 text-center ms-2"
+                  :class="{ 'is-invalid': !dniValido }"
+                  required
+                  oninvalid="this.setCustomValidity('El DNI/NIE es obligatorio')"
+                  oninput="this.setCustomValidity('')"
+                />
+                <button
+                  type="button"
+                  class="btn btn btn-primary ms-3 border-0 shadow-none rounded-0"
+                  @click="buscarClientePorDNI(nuevoCliente.dni)"
+                >
+                  <i class="bi bi-search"></i>
+                </button>
             <div v-if="!dniValido" class="invalid-feedback">
               DNI o NIE inválido.
             </div>
@@ -165,27 +174,44 @@
         </div>
       </div>
 
+      <!-- Aviso Legal -->
+      <div class="text-center ">
+        <input
+          type="checkbox"
+          id="avisolegal"
+          v-model="avisoLegal"
+          class="form-check-input"
+        />
+        <span class="form-check-label ms-3 me-5 mb-0">
+          Aceptar terminos y condiciones: <router-link to="/avisolegal" target="_blank">Aviso Legal</router-link>
+        </span>
+      </div>
 
-        <!-- Botón centrado -->
+
+      <!-- Histórico -->
+      <div class="d-flex justify-content-end mb-2">
+        <input
+          type="checkbox"
+          id="historico"
+          v-model="mostrarHistorico"
+          class="form-check-input"
+          @change="cargarClientes"
+        />
+        <label for="historico" class="form-check-label ms-3 me-5 mb-0"
+          >Histórico</label
+        >
+      </div>
+
+      <!-- Botón centrado -->
       <div class="text-center">
         <button
           type="submit"
-          class="btn btn-primary px-4">
-          {{ editando ? "Modificar Cliente" : "Guardar Cliente" }}
+          class="btn btn-primary border-0 shadow-none rounded-0"
+          :disabled="!avisoLegal"
+        >
+          Cargar
         </button>
       </div>
-
-        <!-- Checkbox al final -->
-        <div class="form-check form-switch ms-3">
-          <input
-            type="checkbox"
-            id="historico"
-            v-model="mostrarHistorico"
-            class="form-check-input"
-            @change="cargarClientes"
-          />
-          <label for="historico" class="form-check-label ms-2">Histórico</label>
-        </div>
     </form>
     
     <!-- Lista de Clientes -->
@@ -227,7 +253,7 @@
               </button>
               <button
                 v-if="cliente.historico === false"
-                @click="activarCliente(cliente.movil)"
+                @click="activarCliente(cliente)"
                 class="btn btn-secondary btn-sm ms-2 border-0 shadow-none rounded-0"
                 title="Activar Cliente"
               >
@@ -256,8 +282,9 @@
 <script setup>
 import provmuniData from '@/data/provmuni.json';
 import { ref, onMounted, computed } from 'vue';
-import { getClientes, deleteCliente, addCliente, updateCliente } from '@/api/clientes.js';
+import { getClientes, deleteCliente, addCliente, updateCliente, getClientePorDni } from '@/api/clientes.js';
 import Swal from 'sweetalert2';
+import AvisoLegal from './AvisoLegal.vue';
 
 // SCRIPTS CRUD //
 
@@ -271,7 +298,8 @@ const nuevoCliente = ref({
   provincia: '',
   municipio: '',
   fechaAlta: '',
-  historico: false // luego lo cambiamos a true
+  historico: false, // luego lo cambiamos a true
+  lopd: false // aceptación del aviso legal (L.O.P.D.)
 });
 
 // Funcion lisar clientes con get
@@ -279,6 +307,9 @@ const nuevoCliente = ref({
 const editando = ref(false); // Estado de edición
 const clienteEditandoId = ref(null); // ID del cliente que se está editando
 const mostrarHistorico = ref(false);
+// Controla si el usuario ha aceptado el Aviso Legal. Hasta que no sea true,
+// la mayoría de campos y acciones estarán deshabilitados.
+const avisoLegal = ref(false);
 const clientes = ref([]);
 
 const numClientes = ref(0);
@@ -340,6 +371,16 @@ const cargarClientes = () => {
 
 
 const guardarCliente = async () => {
+  // Antes de guardar, el usuario debe haber aceptado el Aviso Legal
+  if (!avisoLegal.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Debes aceptar el Aviso Legal antes de guardar',
+      showConfirmButton: false,
+      timer: 2000
+    });
+    return;
+  }
   // Validar duplicados solo si estás creando (no si editando)
 
   if (!editando.value) {
@@ -375,6 +416,9 @@ const guardarCliente = async () => {
       // Validar campos
       // Modificar cliente (PUT)+
 
+      // Asegurarnos de guardar el estado de aceptación LOPD según el checkbox
+      nuevoCliente.value.lopd = avisoLegal.value;
+
       const clienteActualizado = await updateCliente(clienteEditandoId.value, nuevoCliente.value);
 
       // Actualiza el cliente en la lista local
@@ -388,6 +432,9 @@ const guardarCliente = async () => {
       });
     } else {
       // Agregar cliente (POST)
+
+      // Asegurarnos de guardar el estado de aceptación LOPD según el checkbox
+      nuevoCliente.value.lopd = avisoLegal.value;
 
       const clienteAgregado = await addCliente(nuevoCliente.value);
       clientes.value.push(clienteAgregado);
@@ -410,7 +457,8 @@ const guardarCliente = async () => {
       provincia: '',
       municipio: '',
       fechaAlta: '',
-      historico: true
+      historico: true,
+      lopd: false
     };
     editando.value = true;
     clienteEditandoId.value = null;
@@ -543,7 +591,7 @@ const eliminarCliente = async (movil) => {
     timer: 1500
   });
 };
-
+// añadir que cuando editamos editamos a un usuario no se pueda editar el dni
 // Función Editar Cliente (carga datos en el formulario)
 const editarCliente = (movil) => {
   const cliente = clientes.value.find((c) => c.movil === movil);
@@ -556,7 +604,7 @@ const editarCliente = (movil) => {
     });
     return;
   }
-
+ 
   // Copiar datos al formulario
   nuevoCliente.value = { ...cliente }; // 🔁 Aquí cargas el formulario con los datos
   editando.value = true;
@@ -598,7 +646,7 @@ const buscarClientePorDNI = async (dni) => {
 
     // ✅ Cargar los datos en el formulario
     nuevoCliente.value = { ...cliente };
-    nuevoCliente.value.fecha_alta = formatearFechaParaInput(cliente.fecha_alta);
+    nuevoCliente.value.fechaAlta = formatearFechaParaInput(cliente.fechaAlta);
 
     // Actualiza lista de municipios si cambia la provincia
     filtrarMunicipios();

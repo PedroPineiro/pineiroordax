@@ -326,7 +326,9 @@
       "provincia": "Cuenca",
       "municipio": "Alconchel de la Estrella",
       "fechaAlta": "2025-10-02",
-      "historico": true
+      "historico": true,
+      "email": "fdsfs@dfds.com",
+      "lopd": true
     },
     {
       "id": "9afd",
