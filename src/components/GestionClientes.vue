@@ -2,7 +2,7 @@
   <div
     class="container mx-auto mt-2 p-3 my-1 border rounded-0 shadow-sm min-vh-75 bg-light"
   >
-    <h3 class="text-center my-2">Gestión de Clientes</h3>
+    <h2 class="text-center text-primary fw-bold my-4">Gestión de Clientes</h2>
     <!-- Formulario -->
     <form @submit.prevent="guardarCliente" class="mb-4">
       <!-- DNI con validación visual -->
@@ -37,7 +37,7 @@
 
         <!-- Columna Fecha de Alta a la derecha -->
         <div
-          class="col-md-4 ms-auto d-flex align-items-center justify-content-end"
+          class="col-md-4 d-flex align-items-center justify-content-end"
         >
           <label for="fechaAlta" class="form-label me-2 mb-0 text-nowrap"
             >Fecha de Alta:</label
@@ -218,13 +218,13 @@
       </div>
 
       <!-- Botón centrado -->
-      <div class="text-center">
+      <div class="text-center my-3">
         <button
           type="submit"
-          class="btn btn-primary border-0 shadow-none rounded-0"
+          class="btn btn-primary border-0 shadow-none rounded-0 px-4"
           :disabled="!avisoLegal"
         >
-          Cargar
+          {{ editando ? "Modificar" : "Guardar" }}
         </button>
       </div>
     </form>

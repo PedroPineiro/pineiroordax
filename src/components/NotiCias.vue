@@ -34,7 +34,7 @@
               class="btn btn-link fw-bold text-primary text-uppercase"
               @click="agregarNoticia"
             >
-              {{ editando ? 'Guardar cambios' : 'Grabar' }}
+              Publicar
             </button>
           </div>
         </div>

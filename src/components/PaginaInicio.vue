@@ -62,13 +62,10 @@ body, html {
     color: #fff;
     font-size: 3.5rem;
     font-weight: bold;
-    text-shadow: 0 4px 24px #000, 0 1px 0 #444;
     letter-spacing: 2px;
-    background: rgba(0,0,0,0.35);
     border-radius: 20px;
     padding: 1.2rem 2.5rem;
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
-    border: 2px solid #fff3;
+    border: 4px solid #fff3;
     margin-bottom: 0;
     text-align: center;
     transition: transform 0.2s;
