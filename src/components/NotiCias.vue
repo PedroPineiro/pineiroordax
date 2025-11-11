@@ -4,6 +4,7 @@
     <div class="bg-primary py-3 mb-4"></div>
 
     <div class="container">
+      <h2 class="text-center text-primary fw-bold my-4"><i class="bi bi-people-fill"></i>Noticias</h2>
       <!-- Formulario -->
       <div class="card shadow-sm mb-4">
         <div class="card-body">

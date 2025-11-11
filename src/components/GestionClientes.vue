@@ -2,7 +2,9 @@
   <div
     class="container mx-auto mt-2 p-3 my-1 border rounded-0 shadow-sm min-vh-75 bg-light"
   >
-    <h2 class="text-center text-primary fw-bold my-4">Gestión de Clientes</h2>
+    <h2 class="text-center text-primary fw-bold my-4">
+      <i class="bi bi-people-fill"></i> Gestión de Clientes
+    </h2>
     <!-- Formulario -->
     <form @submit.prevent="guardarCliente" class="mb-4">
       <!-- DNI con validación visual -->
@@ -35,9 +37,38 @@
           </div>
         </div>
 
+        <div class="col-md-4 d-flex align-items-center">
+          <label>Tipo de Cliente:</label>
+          <div class="ms-3">
+            <label for="radio-empresa">Empresa:</label>
+            <input
+              type="radio"
+              id="radio-empresa"
+              value="empresa"
+              name="radio"
+              class="ms-2"
+              v-model="nuevoCliente.tipoCliente"
+              required
+            />
+          </div>
+
+          <div class="ms-3">
+            <label for="radio-particular">Particular:</label>
+            <input
+              type="radio"
+              id="radio-particular"
+              value="particular"
+              name="radio"
+              class="ms-2"
+              v-model="nuevoCliente.tipoCliente"
+              required
+            />
+          </div>
+        </div>
+
         <!-- Columna Fecha de Alta a la derecha -->
         <div
-          class="col-md-4 d-flex align-items-center justify-content-end"
+          class="col-md-3 d-flex align-items-center justify-content-end"
         >
           <label for="fechaAlta" class="form-label me-2 mb-0 text-nowrap"
             >Fecha de Alta:</label
@@ -46,8 +77,17 @@
             type="date"
             id="fechaAlta"
             v-model="nuevoCliente.fechaAlta"
-            class="form-control w-auto"
+            class="form-control w-auto me-5"
           />
+
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center"
+            @click="limpiarCampos"
+            title="Reiniciar campos"
+          >
+            <i class="bi bi-arrow-clockwise fs-5"></i>
+          </button>
         </div>
       </div>
 
@@ -190,42 +230,41 @@
         </span>
       </div>
 
-      <div class="col-md-3 d-flex align-items-center">
-        <label>Tipo de Cliente:</label>
-        <div class="ms-3">
-          <label for="radio-empresa">Empresa:</label>
-          <input type="radio" id="radio-empresa" name="radio" class="ms-2" />
+      <!-- Botón centrado y checkbox al final -->
+      <div class="d-flex justify-content-between mt-3">
+        <div class="form-check form-switch ms-3 invisible">
+          <input
+            type="checkbox"
+            id="historico"
+            v-model="mostrarHistorico"
+            class="form-check-input"
+            @change="cargarClientes"
+          />
+          <label for="historico" class="form-check-label ms-2">Histórico</label>
         </div>
 
-        <div class="ms-3">
-          <label for="radio-particular">Particular:</label>
-          <input type="radio" id="radio-particular" name="radio" class="ms-2" />
+        <!-- Espacio izquierdo para centrar el botón -->
+        <div class="flex-grow-1 d-flex justify-content-center">
+          <button
+            type="submit"
+            class="btn btn-primary px-4"
+            :disabled="!nuevoCliente.lopd"
+          >
+            {{ editando ? "Modificar" : "Guardar" }}
+          </button>
         </div>
-      </div>
 
-      <!-- Histórico -->
-      <div class="d-flex justify-content-end mb-2">
-        <input
-          type="checkbox"
-          id="historico"
-          v-model="mostrarHistorico"
-          class="form-check-input"
-          @change="cargarClientes"
-        />
-        <label for="historico" class="form-check-label ms-3 me-5 mb-0"
-          >Histórico</label
-        >
-      </div>
-
-      <!-- Botón centrado -->
-      <div class="text-center my-3">
-        <button
-          type="submit"
-          class="btn btn-primary border-0 shadow-none rounded-0 px-4"
-          :disabled="!avisoLegal"
-        >
-          {{ editando ? "Modificar" : "Guardar" }}
-        </button>
+        <!-- Checkbox al final -->
+        <div class="form-check form-switch ms-3">
+          <input
+            type="checkbox"
+            id="historico"
+            v-model="mostrarHistorico"
+            class="form-check-input"
+            @change="cargarClientes"
+          />
+          <label for="historico" class="form-check-label ms-2">Histórico</label>
+        </div>
       </div>
     </form>
 
@@ -247,7 +286,7 @@
         </thead>
         <tbody>
           <tr v-for="(cliente, index) in clientesPaginados" :key="index">
-            <th scope="row" class="text-center">{{ index + 1 }}</th>
+            <th scope="row" class="text-center">{{ (currentPage - 1) * clientesPorPage + index + 1  }}</th>
             <td>{{ cliente.apellidos }}</td>
             <td>{{ cliente.nombre }}</td>
             <td class="text-center">{{ cliente.movil }}</td>
@@ -314,7 +353,6 @@ import {
   getClientePorDni,
 } from "@/api/clientes.js";
 import Swal from "sweetalert2";
-import AvisoLegal from "./AvisoLegal.vue";
 
 // SCRIPTS CRUD //
 
@@ -790,6 +828,23 @@ const validarMovil = () => {
   // Expresión para móvil español (9 dígitos, empieza por 6, 7, 8 o 9)
   const regex = /^[6789]\d{8}$/;
   movilValido.value = regex.test(movil) || movil === "";
+};
+
+const limpiarCampos = () => {
+  nuevoCliente.value = {
+    dni: "",
+    nombre: "",
+    apellidos: "",
+    email: "",
+    movil: "",
+    direccion: "",
+    provincia: "",
+    municipio: "",
+    fecha_alta: "",
+    historico: true,
+    lopd: false,
+    tipoCliente: "",
+  };
 };
 
 // conversor fecha
