@@ -250,11 +250,12 @@
       "direccion": "Calle García 12",
       "provincia": "Madrid",
       "municipio": "Móstoles",
-      "historico": false,
+      "historico": true,
       "lopd": true,
       "password": "",
       "tipo": "user",
-      "id": "76d6"
+      "id": "76d6",
+      "tipoCliente": "empresa"
     },
     {
       "dni": "Y2345678Z",
@@ -344,12 +345,13 @@
       "movil": "654789464",
       "direccion": "Avda. De Galicia, 101",
       "provincia": "Cuenca",
-      "municipio": "",
+      "municipio": "Acebrón, El",
       "fechaAlta": "2025-10-02",
       "historico": true,
       "email": "fdsfs@dfds.com",
       "lopd": true,
-      "tipo": "user"
+      "tipo": "user",
+      "tipoCliente": "particular"
     },
     {
       "id": "9afd",
@@ -469,6 +471,19 @@
       "titulo": "La UE dando palos de ciego en el mundo del motor",
       "contenido": "A pesar del firme respaldo de países como España y Francia a la meta de 2035 para prohibir la venta de coches nuevos con motores de combustión interna en la Unión Europea, Alemania ha impulsado una revisión de esta normativa ante la presión de los fabricantes de automóviles. Esta directiva forma parte del Pact Verde Europeo y pretende acelerar el fin de los combustibles fósiles en el transporte.",
       "fecha": "2025-10-24"
+    }
+  ],
+  "modelos": [
+    {
+      "id": "1",
+      "nombre": "Gderfgdf",
+      "matricula": "1234ABC",
+      "tipo": "Deportivo",
+      "dueno": "Dgdfgd",
+      "marca": "Nissan",
+      "combustible": "Gasolina",
+      "roto": false,
+      "itv": true
     }
   ]
 }

@@ -1,82 +1,114 @@
 <template>
-    <div class="video-bg">
-        <video autoplay muted loop playsinline class="bg-video">
-            <source src="@/assets/videoCars.mp4" type="video/mp4" />
-            Tu navegador no soporta el video.
-        </video>
-        <div class="content">
-            <h1 class="bienvenida-titulo">Bienvenido a la pagina de Inicio</h1>
-            <!-- Aquí puedes añadir más contenido, botones, etc. -->
-        </div>
+  <div class="video-bg">
+    <video autoplay muted loop playsinline class="bg-video">
+      <source src="@/assets/videoCars.mp4" type="video/mp4" />
+      Tu navegador no soporta el video.
+    </video>
+    <div class="content">
+      <transition name="fade">
+        <h1 v-if="showHeader" class="bienvenida-titulo">
+          Bienvenido a CarTeis
+        </h1>
+      </transition>
     </div>
+  </div>
 </template>
 <script setup>
+import { ref, onMounted } from "vue";
+
+// Controla la visibilidad del título de bienvenida
+const showHeader = ref(true);
+// Tiempo en ms antes de ocultar el h1 (ajústalo si quieres)
+const HIDE_DELAY = 2000;
+
+onMounted(() => {
+  setTimeout(() => {
+    showHeader.value = false;
+  }, HIDE_DELAY);
+});
 </script>
 
 <style scoped>
 .video-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    z-index: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0;
 }
 .bg-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100vw;
-    min-height: 100vh;
-    width: auto;
-    height: auto;
-    transform: translate(-50%, -50%);
-    object-fit: contain;
-    z-index: 1;
-    background: #000;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100vw;
+  min-height: 100vh;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  z-index: 1;
+  background: #000;
 }
 .content {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
 }
-body, html {
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
+body,
+html {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 .bienvenida-titulo {
-    color: #fff;
-    font-size: 3.5rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-    border-radius: 20px;
-    padding: 1.2rem 2.5rem;
-    border: 4px solid #fff3;
-    margin-bottom: 0;
-    text-align: center;
-    transition: transform 0.2s;
+  color: #fff;
+  font-size: 3.5rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  border-radius: 20px;
+  padding: 1.2rem 2.5rem;
+  border: 4px solid #fff3;
+  margin-bottom: 0;
+  text-align: center;
+  transition: transform 0.2s;
 }
 .bienvenida-titulo:hover {
-    transform: scale(1.04) rotate(-1deg);
-    box-shadow: 0 12px 40px 0 rgba(0,0,0,0.45);
-    background: rgba(0,0,0,0.5);
+  transform: scale(1.04) rotate(-1deg);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
 }
-body, html {
-    overflow: hidden;
+body,
+html {
+  overflow: hidden;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 </style>

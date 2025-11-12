@@ -32,7 +32,7 @@
 
           <div class="text-center">
             <button
-              class="btn btn-outline-primary btn-sm fw-bold text-primary text-uppercase"
+              class="btn btn-outline-primary btn-sm fw-bold text-uppercase"
               @click="agregarNoticia"
             >
               Publicar
@@ -73,12 +73,6 @@
             </p>
 
             <div class="d-flex gap-2">
-              <button
-                class="btn btn-sm btn-outline-secondary"
-                @click="editarNoticia(noticia)"
-              >
-                Editar
-              </button>
               <button
                 class="btn btn-sm btn-outline-danger"
                 @click="eliminarNoticia(noticia.id)"
@@ -159,13 +153,6 @@ const eliminarNoticia = async (id) => {
     await deleteNoticia(id);
     noticias.value = noticias.value.filter((n) => n.id !== id);
   }
-};
-
-const editarNoticia = (noticia) => {
-  titulo.value = noticia.titulo;
-  contenido.value = noticia.contenido;
-  idEditando.value = noticia.id;
-  editando.value = true;
 };
 
 // 🔹 Texto truncado dinámico

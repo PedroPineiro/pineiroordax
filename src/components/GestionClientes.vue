@@ -67,9 +67,7 @@
         </div>
 
         <!-- Columna Fecha de Alta a la derecha -->
-        <div
-          class="col-md-3 d-flex align-items-center justify-content-end"
-        >
+        <div class="col-md-3 d-flex align-items-center justify-content-end">
           <label for="fechaAlta" class="form-label me-2 mb-0 text-nowrap"
             >Fecha de Alta:</label
           >
@@ -248,9 +246,9 @@
           <button
             type="submit"
             class="btn btn-primary px-4"
-            :disabled="!nuevoCliente.lopd"
+            :disabled="!avisoLegal"
           >
-            {{ editando ? "Modificar" : "Guardar" }}
+            Guardar
           </button>
         </div>
 
@@ -286,7 +284,9 @@
         </thead>
         <tbody>
           <tr v-for="(cliente, index) in clientesPaginados" :key="index">
-            <th scope="row" class="text-center">{{ (currentPage - 1) * clientesPorPage + index + 1  }}</th>
+            <th scope="row" class="text-center">
+              {{ (currentPage - 1) * clientesPorPage + index + 1 }}
+            </th>
             <td>{{ cliente.apellidos }}</td>
             <td>{{ cliente.nombre }}</td>
             <td class="text-center">{{ cliente.movil }}</td>
