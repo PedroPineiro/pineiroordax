@@ -32,7 +32,7 @@
 
           <div class="text-center">
             <button
-              class="btn btn-link fw-bold text-primary text-uppercase"
+              class="btn btn-outline-primary btn-sm fw-bold text-primary text-uppercase"
               @click="agregarNoticia"
             >
               Publicar
