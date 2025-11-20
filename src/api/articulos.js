@@ -15,8 +15,12 @@ export async function getArticuloById(id) {
 }
 
 // Crear artículo
-export async function addArticulo(articulo) {
-  const res = await axios.post(API_URL, articulo);
+export async function addArticulo(formData) {
+  const res = await axios.post(API_URL, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return res.data;
 }
 
