@@ -212,6 +212,51 @@
         </div>
       </div>
 
+      <!-- Contraseña y Repetir contraseña -->
+      <div class="mb-3 row g-3 align-items-center">
+        <div class="col-md-5 d-flex align-items-center">
+          <label for="password" class="form-label mb-0 text-nowrap w-25"
+            >Contraseña:</label
+          >
+          <input
+            type="password"
+            id="password"
+            v-model="nuevoCliente.password"
+            class="form-control flex-grow-1"
+            required
+          />
+        </div>
+
+        <div class="col-md-5 d-flex align-items-center ms-5">
+          <label for="passwordConfirm" class="form-label me-4 mb-0 text-nowrap"
+            >Repetir contraseña:</label
+          >
+          <input
+            type="password"
+            id="passwordConfirm"
+            v-model="nuevoCliente.passwordConfirm"
+            class="form-control flex-grow-1"
+            :class="{
+              'is-invalid':
+                !passwordMatch &&
+                (nuevoCliente.password !== '' ||
+                  nuevoCliente.passwordConfirm !== ''),
+            }"
+            required
+          />
+          <div
+            v-if="
+              !passwordMatch &&
+              (nuevoCliente.password !== '' ||
+                nuevoCliente.passwordConfirm !== '')
+            "
+            class="invalid-feedback ms-3"
+          >
+            Las contraseñas no coinciden.
+          </div>
+        </div>
+      </div>
+
       <!-- Aviso Legal -->
       <div class="text-center">
         <input
@@ -366,6 +411,8 @@ const nuevoCliente = ref({
   provincia: "",
   municipio: "",
   fechaAlta: "",
+  password: "",
+  passwordConfirm: "",
   historico: false, // luego lo cambiamos a true
   lopd: false, // aceptación del aviso legal (L.O.P.D.)
 });
@@ -745,21 +792,22 @@ const dniValido = ref(true); // Por defecto es válido y no muestra error al ini
 
 // Función para validar DNI y NIE
 const validarDniNie = (valor) => {
+  // Defensa: asegurar que valor es una cadena
+  if (valor === undefined || valor === null) return false;
+  const str = String(valor).toUpperCase();
   const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
   const dniRegex = /^[0-9]{8}[A-Z]$/;
   const nieRegex = /^[XYZ][0-9]{7}[A-Z]$/;
 
-  valor = valor.toUpperCase();
-
-  if (dniRegex.test(valor)) {
-    const numero = parseInt(valor.slice(0, 8), 10);
-    const letra = valor.charAt(8);
-    return letra === letras[numero % 23]; //sale con true si es válido
-  } else if (nieRegex.test(valor)) {
-    const nie = valor.replace("X", "0").replace("Y", "1").replace("Z", "2");
+  if (dniRegex.test(str)) {
+    const numero = parseInt(str.slice(0, 8), 10);
+    const letra = str.charAt(8);
+    return letra === letras[numero % 23]; // true si es válido
+  } else if (nieRegex.test(str)) {
+    const nie = str.replace("X", "0").replace("Y", "1").replace("Z", "2");
     const numero = parseInt(nie.slice(0, 8), 10);
-    const letra = valor.charAt(8);
-    return letra === letras[numero % 23]; //sale con true si es válido
+    const letra = str.charAt(8);
+    return letra === letras[numero % 23]; // true si es válido
   }
   return false;
 };
@@ -846,6 +894,14 @@ const limpiarCampos = () => {
     tipoCliente: "",
   };
 };
+
+// Comprueba si las contraseñas coinciden
+const passwordMatch = computed(() => {
+  return (
+    (nuevoCliente.value.password || "") ===
+    (nuevoCliente.value.passwordConfirm || "")
+  );
+});
 
 // conversor fecha
 function formatearFechaParaInput(fecha) {
