@@ -228,27 +228,25 @@
         </div>
 
         <div class="col-md-5 d-flex align-items-center ms-5">
-          <label for="passwordConfirm" class="form-label me-4 mb-0 text-nowrap"
+          <label for="password2" class="form-label me-4 mb-0 text-nowrap"
             >Repetir contraseña:</label
           >
           <input
             type="password"
-            id="passwordConfirm"
-            v-model="nuevoCliente.passwordConfirm"
+            id="password2"
+            v-model="nuevoCliente.password2"
             class="form-control flex-grow-1"
             :class="{
               'is-invalid':
                 !passwordMatch &&
-                (nuevoCliente.password !== '' ||
-                  nuevoCliente.passwordConfirm !== ''),
+                (nuevoCliente.password !== '' || nuevoCliente.password2 !== ''),
             }"
             required
           />
           <div
             v-if="
               !passwordMatch &&
-              (nuevoCliente.password !== '' ||
-                nuevoCliente.passwordConfirm !== '')
+              (nuevoCliente.password !== '' || nuevoCliente.password2 !== '')
             "
             class="invalid-feedback ms-3"
           >
@@ -398,6 +396,7 @@ import {
   getClientePorDni,
 } from "@/api/clientes.js";
 import Swal from "sweetalert2";
+import bcrypt from "bcryptjs";
 
 // SCRIPTS CRUD //
 
@@ -412,9 +411,12 @@ const nuevoCliente = ref({
   municipio: "",
   fechaAlta: "",
   password: "",
-  passwordConfirm: "",
-  historico: false, // luego lo cambiamos a true
+  password2: "",
+  historico: true,
   lopd: false, // aceptación del aviso legal (L.O.P.D.)
+  tipoCliente: "",
+  tipo: "user",
+  pass: "",
 });
 
 // Funcion lisar clientes con get
@@ -491,6 +493,20 @@ const guardarCliente = async () => {
     });
     return;
   }
+  // Validar contraseñas
+  if (nuevoCliente.value.password !== password2.value) {
+    Swal.fire({
+      icon: "error",
+      title: "Error en contraseña",
+      text: "Las contraseñas no coinciden.",
+      showConfirmButton: true,
+    });
+    return;
+  }
+
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(nuevoCliente.value.password, salt);
+
   // Validar duplicados solo si estás creando (no si editando)
 
   if (!editando.value) {
@@ -525,12 +541,16 @@ const guardarCliente = async () => {
   if (!result.isConfirmed) return;
   //  cliente.fechaAlta = formatearFechaParaInput(cliente.fechaAlta);
   try {
+    nuevoCliente.value.password = hash;
     if (editando.value) {
       // Validar campos
       // Modificar cliente (PUT)+
 
       // Asegurarnos de guardar el estado de aceptación LOPD según el checkbox
       nuevoCliente.value.lopd = avisoLegal.value;
+
+      // Vaciar password2 para que se guarde vacío
+      nuevoCliente.value.password2 = "";
 
       const clienteActualizado = await updateCliente(
         clienteEditandoId.value,
@@ -576,7 +596,11 @@ const guardarCliente = async () => {
       municipio: "",
       fechaAlta: "",
       historico: true,
-      lopd: false,
+      lopd: false, // aceptación del aviso legal (L.O.P.D.)
+      tipoCliente: "",
+      tipo: "user",
+      password: "",
+      password2: "",
     };
     editando.value = true;
     clienteEditandoId.value = null;
@@ -898,8 +922,7 @@ const limpiarCampos = () => {
 // Comprueba si las contraseñas coinciden
 const passwordMatch = computed(() => {
   return (
-    (nuevoCliente.value.password || "") ===
-    (nuevoCliente.value.passwordConfirm || "")
+    (nuevoCliente.value.password || "") === (nuevoCliente.value.password2 || "")
   );
 });
 

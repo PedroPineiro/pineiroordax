@@ -28,9 +28,11 @@
       "municipio": "Badalona",
       "historico": true,
       "lopd": false,
-      "password": "",
+      "password": "$2b$10$Rb0yZhlYIP.s1fN3XSnlROdet76CheotYVaAdxNpsKk63Ra8XzUM6",
       "tipo": "user",
-      "id": "a079"
+      "id": "a079",
+      "password2": "abc123",
+      "tipoCliente": "particular"
     },
     {
       "dni": "45678912S",
@@ -172,9 +174,11 @@
       "municipio": "Getafe",
       "historico": true,
       "lopd": true,
-      "password": "",
+      "password": "abc123",
       "tipo": "user",
-      "id": "1b52"
+      "id": "1b52",
+      "password2": "abc123",
+      "tipoCliente": "particular"
     },
     {
       "dni": "X9876543K",
@@ -351,7 +355,9 @@
       "email": "fdsfs@dfds.com",
       "lopd": true,
       "tipo": "user",
-      "tipoCliente": "particular"
+      "tipoCliente": "particular",
+      "password": "$2b$10$w5Iwnjks8AvFiZRgAYG6s.iH7oEuqb.WvbHjaRZ5Nuk7Y9UVtGgtm",
+      "password2": "abc123"
     },
     {
       "id": "9afd",
@@ -408,7 +414,11 @@
       "municipio": "Alájar",
       "fechaAlta": "2025-10-09",
       "historico": true,
-      "tipo": "user"
+      "tipo": "user",
+      "password": "$2b$10$5VSVzAmLaFLTFWb29lbi6u/fM1os1OUe0Wk05KKUZGY23OES9oHau",
+      "password2": "",
+      "tipoCliente": "particular",
+      "lopd": true
     },
     {
       "id": "68a1",
@@ -422,7 +432,11 @@
       "municipio": "Cerro de Andévalo, El",
       "fechaAlta": "2025-10-08",
       "historico": true,
-      "tipo": "user"
+      "tipo": "user",
+      "password": "$2b$10$R/zYj00yjeYksI3K9e.9QO3cduXx2rCJtuw5dEQRV4Yhn6EsVWiBS",
+      "password2": "abc123",
+      "tipoCliente": "particular",
+      "lopd": true
     },
     {
       "id": "b38d",
