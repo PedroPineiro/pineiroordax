@@ -59,115 +59,115 @@
 </template>
 
 <script>
-/*
-  import Swal from 'sweetalert2';
-  import passport from  '../config/passport.mjs';
-  
-  export default {
-    name: "TablaLogin",
-    components: {
-      
+// DEBE QUEDAR CLARO QUE ESTA ES UNA SIMULACION DE LOGIN PARA FINES DIDACTICOS CON JSON-SERVER
+// EN NINGUN CASO DEBE USARSE ESTA IMPLEMENTACION EN PRODUCCION
+// PARA UNA APLICACION REAL
+import Swal from "sweetalert2";
+import passport from "../config/passport.mjs";
+import { loginUsuario } from "../api/authApi";
+
+export default {
+  name: "TablaLogin",
+  components: {},
+  data() {
+    return {
+      dni: "",
+      pass: "",
+      errorMessage: "",
+      usuarios: [], // Aquí se almacenarán los usuarios cargados desde el archivo JSON
+    };
+  },
+
+  mounted() {
+    // Cargar los usuarios desde el archivo datos.json al montar el componente
+    console.log(this.$router.options.routes);
+  },
+
+  created() {
+    // Cargar los usuarios desde el archivo datos.json al crear el componente
+    this.getUsuarios();
+  },
+
+  methods: {
+    async getUsuarios() {
+      try {
+        const response = await fetch("http://localhost:3000/usuarios");
+        if (!response.ok) {
+          throw new Error("Error en la solicitud: " + response.statusText);
+        }
+
+        // Obtener y ordenar usuarios por apellidos y luego por nombre
+        this.usuarios = (await response.json()).sort(
+          (a, b) =>
+            a.apellidos.localeCompare(b.apellidos) ||
+            a.nombre.localeCompare(b.nombre)
+        );
+      } catch (error) {
+        console.error(error);
+      }
     },
-    data() {
-      return {
-        dni: "",
-        pass: "",
-        errorMessage: "",
-        usuarios: [] // Aquí se almacenarán los usuarios cargados desde el archivo JSON
-      };
-    },
 
-    mounted() {
-      // Cargar los usuarios desde el archivo datos.json al montar el componente
-      console.log(this.$router.options.routes);
+    async iniciarSesion() {
+      // Buscar el usuario con el DNI proporcionado
+      const usuario = this.usuarios.find((user) => user.dni === this.dni);
 
-    },
-  
-    created() {
-      // Cargar los usuarios desde el archivo datos.json al crear el componente
-      this.getUsuarios();
-    },
+      // Verificar si el usuario existe
+      if (usuario) {
+        // Verificar la contraseña usando passport para compararla con la encriptada
+        const contrasenaCorrecta = await passport.verificarContrasena(
+          this.pass,
+          usuario.pass
+        );
 
-    methods: {
-
-        async getUsuarios() {
-            try {
-                const response = await fetch('http://localhost:3000/usuarios');
-                if (!response.ok) {
-                    throw new Error('Error en la solicitud: ' + response.statusText);
-                }
-
-                // Obtener y ordenar usuarios por apellidos y luego por nombre
-                this.usuarios = (await response.json()).sort((a, b) =>
-                    a.apellidos.localeCompare(b.apellidos) || a.nombre.localeCompare(b.nombre)
-                );
-
-                } catch (error) {
-                    console.error(error);
-                }
-            },
-
-        async iniciarSesion() {
-            // Buscar el usuario con el DNI proporcionado
-            const usuario = this.usuarios.find((user) => user.dni === this.dni);
-    
-            // Verificar si el usuario existe
-            if (usuario) {
-            // Verificar la contraseña usando passport para compararla con la encriptada
-            const contrasenaCorrecta = await passport.verificarContrasena(
-                this.pass,
-                usuario.pass
-            );
-  
-          if (contrasenaCorrecta) {
-            // Guardar datos en Vuex al iniciar sesión
-            this.$store.dispatch("login", usuario);
-            if (usuario.tipo === "admin" || usuario.tipo === "usuario") {
-              this.errorMessage = ""; // Limpiar mensaje de error si las credenciales son correctas
-              this.mostrarAlerta("Bienvenido", "Sesión Iniciada", "success")
-              localStorage.setItem('isLogueado', 'true')
-              localStorage.setItem('userName', usuario.nombre)
-              if (usuario.tipo === "admin") {
-                localStorage.setItem('isAdmin', 'true')
-                this.$router.push({ name: 'inicio' }).then(() => {
-                window.location.reload();  // Recargar la página
+        if (contrasenaCorrecta) {
+          // Guardar datos en Vuex al iniciar sesión
+          this.$store.dispatch("login", usuario);
+          if (usuario.tipo === "admin" || usuario.tipo === "usuario") {
+            this.errorMessage = ""; // Limpiar mensaje de error si las credenciales son correctas
+            this.mostrarAlerta("Bienvenido", "Sesión Iniciada", "success");
+            localStorage.setItem("isLogueado", "true");
+            localStorage.setItem("userName", usuario.nombre);
+            if (usuario.tipo === "admin") {
+              localStorage.setItem("isAdmin", "true");
+              this.$router.push({ name: "inicio" }).then(() => {
+                window.location.reload(); // Recargar la página
               });
-              } else {
-                localStorage.setItem('isUsuario', 'true')
-                this.$router.push({ name: 'inicio' }).then(() => {
-                window.location.reload();  // Recargar la página
-              });
-              }
-            
-              // Redirigir o hacer algo después del inicio de sesión
             } else {
-              this.errorMessage = "DNI y/o contraseña incorrectos 1.";
+              localStorage.setItem("isUsuario", "true");
+              this.$router.push({ name: "inicio" }).then(() => {
+                window.location.reload(); // Recargar la página
+              });
             }
+
             // Redirigir o hacer algo después del inicio de sesión
           } else {
-            this.errorMessage = "DNI y/o contraseña incorrectos 2.";
+            this.errorMessage = "DNI y/o contraseña incorrectos 1.";
           }
+          // Redirigir o hacer algo después del inicio de sesión
         } else {
-          this.errorMessage = "DNI y/o contraseña incorrectos. 3";
+          this.errorMessage = "DNI y/o contraseña incorrectos 2.";
         }
-      },
-           // Método para mostrar alertas
-    mostrarAlerta(titulo, mensaje, icono) {
-        Swal.fire({
-          title: titulo,
-          text: mensaje,
-          icon: icono,
-          showConfirmButton: false,
-          timer: 3000,
-          customClass: {
-            container: 'custom-alert-container',
-            popup: 'custom-alert-popup',
-            modal: 'custom-alert-modal'
-          }
-        });
+      } else {
+        this.errorMessage = "DNI y/o contraseña incorrectos. 3";
       }
-    }
-  }; */
+    },
+    // Método para mostrar alertas
+    mostrarAlerta(titulo, mensaje, icono) {
+      Swal.fire({
+        title: titulo,
+        text: mensaje,
+        icon: icono,
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: {
+          container: "custom-alert-container",
+          popup: "custom-alert-popup",
+          modal: "custom-alert-modal",
+        },
+      });
+    },
+  },
+};
 </script>
 
 <style>

@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import authRoutes from "./authRoutes.js";
 
 // a diferencia de json-server, aquí necesita configurar las rutas y controladores manualmente
 // json-server crea automáticamente las rutas basadas en el archivo JSON, mongoose requiere definir esquemas y modelos
@@ -27,6 +28,9 @@ app.use(express.json());
 // json-server es un backend ya construido.
 // Express es un backend que TÚ construyes.
 // Por eso json-server no requiere rutas y Express sí.
+
+app.use("/api/auth", authRoutes)
+
 app.use("/api/articulos", articulosRoutes);
 
 // Verificar variable
