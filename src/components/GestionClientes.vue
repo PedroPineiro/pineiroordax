@@ -310,8 +310,8 @@
     </form>
 
     <!-- Lista de Clientes -->
-    <div class="table-responsive">
-      <h4 class="text-center w-100">Listado Clientes</h4>
+    <div v-if="isAdmin" class="table-responsive mt-1">
+      <h4 class="text-center mb-1 bg-secondary text-white">Listado Clientes</h4>
       <table
         class="table table-bordered table-striped table-hover table-sm w-100 align-middle"
       >
@@ -427,6 +427,8 @@ const mostrarHistorico = ref(false);
 // la mayoría de campos y acciones estarán deshabilitados.
 const avisoLegal = ref(false);
 const clientes = ref([]);
+
+const isAdmin = ref(localStorage.getItem("isAdmin") === "true");
 
 const numClientes = ref(0);
 const currentPage = ref(1);

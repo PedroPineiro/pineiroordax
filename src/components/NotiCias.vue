@@ -6,7 +6,7 @@
     <div class="container">
       <h2 class="text-center text-primary fw-bold my-4"><i class="bi bi-people-fill"></i>Noticias</h2>
       <!-- Formulario -->
-      <div class="card shadow-sm mb-4">
+      <div v-if="isAdmin" class="card shadow-sm mb-4">
         <div class="card-body">
           <div class="mb-3">
             <label for="titulo" class="form-label fw-bold">Título:</label>
@@ -110,6 +110,8 @@ const editando = ref(false);
 const idEditando = ref(null);
 const expandido = ref({}); // Controla qué noticias están desplegadas
 const maxLongitud = 180; // Máximo de caracteres antes de truncar
+const isAdmin = ref(localStorage.getItem("isAdmin") === "true");
+
 
 onMounted(async () => {
   noticias.value = await getNoticias();

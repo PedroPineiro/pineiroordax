@@ -38,6 +38,9 @@
             <router-link class="nav-link" to="/modelos">Modelos</router-link>
           </li>
           <li class="nav-item">
+            <router-link class="nav-link" to="/ventas">Ventas</router-link>
+          </li>
+          <li class="nav-item">
             <router-link class="nav-link" to="/listaModelos"
               >Lista Modelos</router-link
             >
