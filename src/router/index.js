@@ -7,6 +7,7 @@ import AvisoLegal from "../components/AvisoLegal.vue";
 import ModeLos from "../components/ModeLos.vue";
 import ListaModelos from "../components/ListaModelos.vue";
 import PoliticaPrivacidad from "../components/PoliticaPrivacidad.vue";
+import TablaLogin from "../components/TablaLogin.vue";
 
 const routes = [
   {
@@ -43,6 +44,11 @@ const routes = [
     path: "/listaModelos",
     name: "ListaModelos",
     component: ListaModelos,
+  },
+  {
+    path: "/login",
+    name: "TablaLogin",
+    component: TablaLogin,
   },
   {
     path: "/:pathMatch(.*)*",

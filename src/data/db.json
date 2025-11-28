@@ -356,8 +356,8 @@
       "lopd": true,
       "tipo": "user",
       "tipoCliente": "particular",
-      "password": "$2b$10$w5Iwnjks8AvFiZRgAYG6s.iH7oEuqb.WvbHjaRZ5Nuk7Y9UVtGgtm",
-      "password2": "abc123"
+      "password": "$2b$10$Au5TSqiULZfucUbSOgpcbOg3JiwI9LmBNHekRJlhlRw3VfCrnN9jK",
+      "password2": ""
     },
     {
       "id": "9afd",
@@ -465,6 +465,24 @@
       "fechaAlta": "2025-10-15",
       "historico": false,
       "tipo": "user"
+    },
+    {
+      "id": "9092",
+      "dni": "55555555K",
+      "nombre": "Pedro",
+      "apellidos": "Piñeiro Ordax",
+      "email": "pedro@gmail.com",
+      "movil": "606060606",
+      "direccion": "Calle Teixugueiras",
+      "provincia": "Pontevedra",
+      "municipio": "Vigo",
+      "fechaAlta": "2025-11-27",
+      "password": "$2b$10$jn5bC4wtb8tPw4Tbth6Ge.thP7L9iq2alZI9Z3k9Xlob.tk.PkEWq",
+      "password2": "loquete013",
+      "historico": true,
+      "lopd": true,
+      "tipoCliente": "empresa",
+      "tipo": "admin"
     }
   ],
   "noticias": [

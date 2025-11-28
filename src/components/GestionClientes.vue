@@ -413,10 +413,9 @@ const nuevoCliente = ref({
   password: "",
   password2: "",
   historico: true,
-  lopd: false, // aceptación del aviso legal (L.O.P.D.)
+  lopd: false,
   tipoCliente: "",
   tipo: "user",
-  pass: "",
 });
 
 // Funcion lisar clientes con get
