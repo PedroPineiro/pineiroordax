@@ -3,35 +3,46 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const login = async (req, res) => {
-    const { dni, password } = req.body;
+  const { dni, password } = req.body;
 
-    try {
-        // Buscar usuario en JSON-Server
-        const response = await axios.get(`http://localhost:3000/clientes?dni=${dni}`);
-        const user = response.data[0];
+  try {
+    const response = await axios.get(
+      `http://localhost:3000/clientes?dni=${dni}`
+    );
+    const user = response.data[0];
 
-        if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
 
-        // importante: bycrypt.compare() hace internamente el hash de la contraseña en texto plano y la compara con el hash almacenado
-        const ok = await bcrypt.compare(password, user.password);
-        if (!ok) return res.status(400).json({ message: "Usuario o Contraseña incorrecta" });
-
-        const token = jwt.sign(
-            { dni: user.dni, tipo: user.tipo || "user" },
-            process.env.JWT_SECRET,
-            { expiresIn: "2h" }
-        );
-
-        res.json({
-            token,
-            nombre: user.nombre,
-            tipo: user.tipo || "user",
-        });
-    } catch (error) {
-        console.error("Error en login:", error);
-        res.status(500).json({ message: "Error interno del servidor" });
+    // Verificación de contraseña con fallback para desarrollo
+    let ok = false;
+    if (user.password && user.password.startsWith("$2")) {
+      // Hash bcrypt
+      ok = await bcrypt.compare(password, user.password);
+    } else {
+      // Texto plano (solo desarrollo)
+      ok = password === user.password;
     }
-}
+
+    if (!ok) return res.status(400).json({ message: "Contraseña incorrecta" });
+
+    const token = jwt.sign(
+      {
+        dni: user.dni,
+        tipo: user.tipo || "user",
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+
+    res.json({ token, nombre: user.nombre, tipo: user.tipo || "user" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error interno en el servidor" });
+  }
+};
+
+/////////////// MEJOR EN UN FICHERO APARTE authMiddleware.js
 
 // Middleware: verificar JWT
 // Se usa en rutas que requieren autenticación

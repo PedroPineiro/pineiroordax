@@ -2,9 +2,9 @@
   <div
     class="container mx-auto mt-2 p-3 my-1 border rounded-0 shadow-sm min-vh-75 bg-light"
   >
-    <h2 class="text-center text-primary fw-bold my-4">
+    <h3 class="text-center my-2 gestion-header">
       <i class="bi bi-people-fill"></i> Gestión de Clientes
-    </h2>
+    </h3>
     <!-- Formulario -->
     <form @submit.prevent="guardarCliente" class="mb-4">
       <!-- DNI con validación visual -->
@@ -18,9 +18,10 @@
               id="dni"
               v-model="nuevoCliente.dni"
               @blur="validarDni"
-              class="form-control w-auto w-25 text-center ms-2"
+              class="form-control w-auto w-25 text-center ms-0"
               :class="{ 'is-invalid': !dniValido }"
               required
+              :disabled="editando"
               oninvalid="this.setCustomValidity('El DNI/NIE es obligatorio')"
               oninput="this.setCustomValidity('')"
             />
@@ -36,36 +37,29 @@
             </div>
           </div>
         </div>
-
         <div class="col-md-4 d-flex align-items-center">
-          <label>Tipo de Cliente:</label>
+          <label>Tipo de Cliente: </label>
           <div class="ms-3">
             <label for="radio-empresa">Empresa:</label>
             <input
               type="radio"
               id="radio-empresa"
-              value="empresa"
               name="radio"
-              class="ms-2"
               v-model="nuevoCliente.tipoCliente"
-              required
+              class="ms-2"
             />
           </div>
-
           <div class="ms-3">
             <label for="radio-particular">Particular:</label>
             <input
               type="radio"
               id="radio-particular"
-              value="particular"
               name="radio"
-              class="ms-2"
               v-model="nuevoCliente.tipoCliente"
-              required
+              class="ms-2"
             />
           </div>
         </div>
-
         <!-- Columna Fecha de Alta a la derecha -->
         <div class="col-md-3 d-flex align-items-center justify-content-end">
           <label for="fechaAlta" class="form-label me-2 mb-0 text-nowrap"
@@ -77,7 +71,6 @@
             v-model="nuevoCliente.fechaAlta"
             class="form-control w-auto me-5"
           />
-
           <button
             type="button"
             class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center"
@@ -212,6 +205,7 @@
         </div>
       </div>
 
+      <!-- Aviso Legal -->
       <!-- Contraseña y Repetir contraseña -->
       <div class="mb-3 row g-3 align-items-center">
         <div class="col-md-5 d-flex align-items-center">
@@ -224,29 +218,33 @@
             v-model="nuevoCliente.password"
             class="form-control flex-grow-1"
             required
+            disabled
           />
         </div>
 
         <div class="col-md-5 d-flex align-items-center ms-5">
-          <label for="password2" class="form-label me-4 mb-0 text-nowrap"
+          <label for="passwordConfirm" class="form-label me-4 mb-0 text-nowrap"
             >Repetir contraseña:</label
           >
           <input
             type="password"
-            id="password2"
-            v-model="nuevoCliente.password2"
+            id="passwordConfirm"
+            v-model="nuevoCliente.passwordConfirm"
             class="form-control flex-grow-1"
             :class="{
               'is-invalid':
                 !passwordMatch &&
-                (nuevoCliente.password !== '' || nuevoCliente.password2 !== ''),
+                (nuevoCliente.password !== '' ||
+                  nuevoCliente.passwordConfirm !== ''),
             }"
             required
+            disabled
           />
           <div
             v-if="
               !passwordMatch &&
-              (nuevoCliente.password !== '' || nuevoCliente.password2 !== '')
+              (nuevoCliente.password !== '' ||
+                nuevoCliente.passwordConfirm !== '')
             "
             class="invalid-feedback ms-3"
           >
@@ -255,7 +253,6 @@
         </div>
       </div>
 
-      <!-- Aviso Legal -->
       <div class="text-center">
         <input
           type="checkbox"
@@ -270,48 +267,33 @@
           >
         </span>
       </div>
+      <!-- Histórico -->
+      <!-- Checkbox al final - solo visible para admin -->
+      <div class="form-check form-switch ms-3" v-if="isAdmin">
+        <input
+          type="checkbox"
+          id="historico"
+          v-model="mostrarHistorico"
+          class="form-check-input"
+          @change="cargarClientes"
+        />
+        <label for="historico" class="form-check-label ms-2">Histórico</label>
+      </div>
 
-      <!-- Botón centrado y checkbox al final -->
-      <div class="d-flex justify-content-between mt-3">
-        <div class="form-check form-switch ms-3 invisible">
-          <input
-            type="checkbox"
-            id="historico"
-            v-model="mostrarHistorico"
-            class="form-check-input"
-            @change="cargarClientes"
-          />
-          <label for="historico" class="form-check-label ms-2">Histórico</label>
-        </div>
-
-        <!-- Espacio izquierdo para centrar el botón -->
-        <div class="flex-grow-1 d-flex justify-content-center">
-          <button
-            type="submit"
-            class="btn btn-primary px-4"
-            :disabled="!avisoLegal"
-          >
-            Guardar
-          </button>
-        </div>
-
-        <!-- Checkbox al final -->
-        <div class="form-check form-switch ms-3">
-          <input
-            type="checkbox"
-            id="historico"
-            v-model="mostrarHistorico"
-            class="form-check-input"
-            @change="cargarClientes"
-          />
-          <label for="historico" class="form-check-label ms-2">Histórico</label>
-        </div>
+      <!-- Botón centrado -->
+      <div class="text-center">
+        <button
+          type="submit"
+          :disabled="!avisoLegal"
+          class="btn btn-primary px-4"
+        >
+          {{ editando ? "Modificar" : "Guardar" }}
+        </button>
       </div>
     </form>
-
     <!-- Lista de Clientes -->
-    <div v-if="isAdmin" class="table-responsive mt-1">
-      <h4 class="text-center mb-1 bg-secondary text-white">Listado Clientes</h4>
+    <div v-if="isAdmin" class="table-responsive">
+      <h4 class="text-center w-100">Listado Clientes</h4>
       <table
         class="table table-bordered table-striped table-hover table-sm w-100 align-middle"
       >
@@ -338,6 +320,10 @@
               <button
                 @click="eliminarCliente(cliente.movil)"
                 class="btn btn-danger btn-sm border-0 ms-4 me-2 shadow-none rounded-0"
+                title="Eliminar cliente"
+                aria-label="Eliminar cliente"
+                :disabled="!cliente.historico"
+                :aria-disabled="String(cliente.historico)"
               >
                 <i class="bi bi-trash"></i>
               </button>
@@ -360,7 +346,6 @@
           </tr>
         </tbody>
       </table>
-
       <!-- Navegación de página-->
       <div class="d-flex justify-content-center my-3">
         <button
@@ -388,6 +373,7 @@
 <script setup>
 import provmuniData from "@/data/provmuni.json";
 import { ref, onMounted, computed } from "vue";
+import bcrypt from "bcryptjs";
 import {
   getClientes,
   deleteCliente,
@@ -396,10 +382,12 @@ import {
   getClientePorDni,
 } from "@/api/clientes.js";
 import Swal from "sweetalert2";
-import bcrypt from "bcryptjs";
+import AvisoLegal from "./AvisoLegal.vue";
+import { jwtDecode } from "jwt-decode";
 
 // SCRIPTS CRUD //
 
+// Objeto reactivo que almacena los datos del cliente actual en el formulario
 const nuevoCliente = ref({
   dni: "",
   nombre: "",
@@ -410,34 +398,59 @@ const nuevoCliente = ref({
   provincia: "",
   municipio: "",
   fechaAlta: "",
+  historico: false, // luego lo cambiamos a true
+  lopd: false, // aceptación del aviso legal (L.O.P.D.)
   password: "",
-  password2: "",
-  historico: true,
-  lopd: false,
-  tipoCliente: "",
-  tipo: "user",
+  passwordConfirm: "",
 });
 
 // Funcion lisar clientes con get
 
-const editando = ref(false); // Estado de edición
+const editando = ref(false); // Modo edición activado o no
 const clienteEditandoId = ref(null); // ID del cliente que se está editando
 const mostrarHistorico = ref(false);
+// Detectar si el usuario actual es admin (guardado en sessionStorage por el login)
+const isAdmin = ref(sessionStorage.getItem("isAdmin") === "true");
 // Controla si el usuario ha aceptado el Aviso Legal. Hasta que no sea true,
 // la mayoría de campos y acciones estarán deshabilitados.
-const avisoLegal = ref(false);
-const clientes = ref([]);
+const avisoLegal = ref(false); // Si el aviso legal ha sido aceptado
+const clientes = ref([]); // Array que almacena todos los clientes
 
-const isAdmin = ref(localStorage.getItem("isAdmin") === "true");
-
+// Variables para paginación
 const numClientes = ref(0);
 const currentPage = ref(1);
 const clientesPorPage = 10; // por defecto seria ref(10) y asi con 20 y 30 que sea un boton de checkbox
+
 // Cargar clientes al montar el componente
 
 // Zona Cargar clientes Al Montar el componente
+// Al montar el componente, se cargan los clientes y se reinicia la página actual.
 onMounted(async () => {
-  cargarClientes();
+  // Leer estado de admin desde sessionStorage en el momento de montar (más robusto)
+  isAdmin.value = sessionStorage.getItem("isAdmin") === "true";
+  const isUsuario = sessionStorage.getItem("isUsuario") === "true";
+
+  // Si es admin mostramos el histórico completo por defecto
+  if (isAdmin.value) {
+    mostrarHistorico.value = true;
+    cargarClientes();
+  }
+  // Si es usuario normal, cargar su perfil directamente
+  else if (isUsuario) {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const dniUsuario = decoded.dni;
+        if (dniUsuario) {
+          await buscarClientePorDNI(dniUsuario);
+        }
+      } catch (error) {
+        console.error("Error al decodificar token:", error);
+      }
+    }
+  }
+
   currentPage.value = 1;
 });
 ///avanzar y retroceder
@@ -450,9 +463,8 @@ const beforePagina = () => {
 };
 
 const nextPagina = () => {
-  const totalPages = Math.ceil(numClientes.value / clientesPorPage);
   //redondear hacia arriba para mostrar la última página aunque no esté completa
-  if (currentPage.value < totalPages) {
+  if (currentPage.value < totalPages.value) {
     currentPage.value++;
   }
 };
@@ -464,16 +476,23 @@ const nextPagina = () => {
 // slice extrae una sección del array clientes
 // start es el índice inicial y end el índice final (no incluido)
 
+// Propiedad computada: obtiene los clientes visibles en la página actual
+// computed → se actualiza automáticamente si cambia currentPage o clientes
 const clientesPaginados = computed(() => {
   const start = (currentPage.value - 1) * clientesPorPage;
   const end = start + clientesPorPage;
   return clientes.value.slice(start, end);
 });
 
+const totalPages = computed(() => {
+  return Math.ceil(numClientes.value / clientesPorPage);
+});
+
 const cargarClientes = () => {
+  // llama a la API
   getClientes(mostrarHistorico.value).then((data) => {
     clientes.value = data;
-    numClientes.value = data.length; // ✅ actualizar total de clientes
+    numClientes.value = data.length; // actualizar total de clientes
   });
   Swal.fire({
     icon: "success",
@@ -484,18 +503,8 @@ const cargarClientes = () => {
 };
 
 const guardarCliente = async () => {
-  // Antes de guardar, el usuario debe haber aceptado el Aviso Legal
-  if (!avisoLegal.value) {
-    Swal.fire({
-      icon: "warning",
-      title: "Debes aceptar el Aviso Legal antes de guardar",
-      showConfirmButton: false,
-      timer: 2000,
-    });
-    return;
-  }
   // Validar contraseñas
-  if (nuevoCliente.value.password !== password2.value) {
+  if (nuevoCliente.value.password !== passwordConfirm.value) {
     Swal.fire({
       icon: "error",
       title: "Error en contraseña",
@@ -508,8 +517,30 @@ const guardarCliente = async () => {
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(nuevoCliente.value.password, salt);
 
+  // Antes de guardar, el usuario debe haber aceptado el Aviso Legal
+  if (!avisoLegal.value) {
+    Swal.fire({
+      icon: "warning",
+      title: "Debes aceptar el Aviso Legal antes de guardar",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+    return;
+  }
+
+  // Comprobación de contraseñas: deben coincidir
+  if (nuevoCliente.value.password !== nuevoCliente.value.passwordConfirm) {
+    Swal.fire({
+      icon: "error",
+      title: "Las contraseñas no coinciden",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+    return;
+  }
   // Validar duplicados solo si estás creando (no si editando)
 
+  // Evita duplicados si estamos creando un nuevo cliente
   if (!editando.value) {
     const duplicado = clientes.value.find(
       (cliente) =>
@@ -528,7 +559,7 @@ const guardarCliente = async () => {
     }
   }
 
-  // Confirmación antes de guardar
+  // Confirmación visual antes de guardar o modificar
   const result = await Swal.fire({
     title: editando.value
       ? "¿Desea modificar este cliente?"
@@ -541,24 +572,23 @@ const guardarCliente = async () => {
 
   if (!result.isConfirmed) return;
   //  cliente.fechaAlta = formatearFechaParaInput(cliente.fechaAlta);
+
   try {
     nuevoCliente.value.password = hash;
+    // modo edicion
     if (editando.value) {
       // Validar campos
       // Modificar cliente (PUT)+
 
       // Asegurarnos de guardar el estado de aceptación LOPD según el checkbox
       nuevoCliente.value.lopd = avisoLegal.value;
-
-      // Vaciar password2 para que se guarde vacío
-      nuevoCliente.value.password2 = "";
-
+      // Actualiza el cliente en la API
       const clienteActualizado = await updateCliente(
         clienteEditandoId.value,
         nuevoCliente.value
       );
 
-      // Actualiza el cliente en la lista local
+      // Reemplaza el cliente modificado en la lista local
       const index = clientes.value.findIndex(
         (c) => c.id === clienteEditandoId.value
       );
@@ -585,7 +615,7 @@ const guardarCliente = async () => {
       });
     }
 
-    // Reset formulario y estado
+    // Limpieza Reset formulario y estado
     nuevoCliente.value = {
       dni: "",
       nombre: "",
@@ -597,11 +627,9 @@ const guardarCliente = async () => {
       municipio: "",
       fechaAlta: "",
       historico: true,
-      lopd: false, // aceptación del aviso legal (L.O.P.D.)
-      tipoCliente: "",
-      tipo: "user",
+      lopd: false,
       password: "",
-      password2: "",
+      passwordConfirm: "",
     };
     editando.value = true;
     clienteEditandoId.value = null;
@@ -693,6 +721,7 @@ const eliminarCliente = async (movil) => {
 
   clientes.value = await getClientes();
   // Buscar cliente completo (que incluye el ID)
+  // Busca el cliente por movil
   const clienteAEliminar = clientes.value.find(
     (cliente) => cliente.movil === movil
   );
@@ -720,6 +749,7 @@ const eliminarCliente = async (movil) => {
   if (!result.isConfirmed) return;
 
   // Si confirma, eliminar cliente usando la API y movil como ID
+  // En lugar de borrar, marcamos el histórico como false (eliminado)
   await deleteCliente(clienteAEliminar.id);
   // Refrescar la lista desde la "API"
   clientes.value = await getClientes();
@@ -745,8 +775,11 @@ const editarCliente = (movil) => {
     return;
   }
 
-  // Copiar datos al formulario
+  // Cargar datos al formulario (sin contraseña por seguridad)
   nuevoCliente.value = { ...cliente }; // 🔁 Aquí cargas el formulario con los datos
+  // No mostrar la contraseña al editar
+  nuevoCliente.value.password = "";
+  nuevoCliente.value.passwordConfirm = "";
   editando.value = true;
   // Formatear fecha para el input type="date"
   nuevoCliente.value.fechaAlta = formatearFechaParaInput(cliente.fechaAlta);
@@ -783,8 +816,11 @@ const buscarClientePorDNI = async (dni) => {
       return;
     }
 
-    // ✅ Cargar los datos en el formulario
+    // Cargar los datos encontrados en el formulario (sin contraseña por seguridad)
     nuevoCliente.value = { ...cliente };
+    // No mostrar la contraseña al editar
+    nuevoCliente.value.password = "";
+    nuevoCliente.value.passwordConfirm = "";
     nuevoCliente.value.fechaAlta = formatearFechaParaInput(cliente.fechaAlta);
 
     // Actualiza lista de municipios si cambia la provincia
@@ -838,6 +874,7 @@ const validarDniNie = (valor) => {
 };
 
 // Función única: capitaliza y asigna en el mismo paso
+// Convierte texto a formato capitalizado (Primera letra en mayúscula)
 const capitalizarTexto = (campo) => {
   const texto = nuevoCliente.value[campo] ?? "";
   nuevoCliente.value[campo] = texto
@@ -852,6 +889,7 @@ const capitalizarTexto = (campo) => {
 
 // control email
 
+// Validaciones básicas de email y móvil
 const emailValido = ref(true);
 const validarEmail = () => {
   const email = nuevoCliente.value.email.trim();
@@ -860,8 +898,16 @@ const validarEmail = () => {
   emailValido.value = regex.test(email);
 };
 
-// Provincias y municipios
+// Comprueba si las contraseñas coinciden
+const passwordMatch = computed(() => {
+  return (
+    (nuevoCliente.value.password || "") ===
+    (nuevoCliente.value.passwordConfirm || "")
+  );
+});
 
+// Provincias y municipios
+// Filtrado de municipios según la provincia seleccionada
 const provincias = ref(provmuniData.provincias); // Array de provincias
 const municipios = ref(provmuniData.municipios); // Array de municipios para filtrarlos
 const municipiosFiltrados = ref([]); // vacío pero contendrá los municipios filtrados
@@ -892,8 +938,12 @@ const filtrarMunicipios = () => {
 const movilValido = ref(true);
 // Validar al salir del campo
 const validarDni = () => {
-  nuevoCliente.value.dni = nuevoCliente.value.dni.trim().toUpperCase();
-  dniValido.value = validarDniNie(dni);
+  // Asegurarse de que el campo existe y es cadena
+  nuevoCliente.value.dni = (nuevoCliente.value.dni || "")
+    .toString()
+    .trim()
+    .toUpperCase();
+  dniValido.value = validarDniNie(nuevoCliente.value.dni);
 };
 
 const validarMovil = () => {
@@ -903,31 +953,8 @@ const validarMovil = () => {
   movilValido.value = regex.test(movil) || movil === "";
 };
 
-const limpiarCampos = () => {
-  nuevoCliente.value = {
-    dni: "",
-    nombre: "",
-    apellidos: "",
-    email: "",
-    movil: "",
-    direccion: "",
-    provincia: "",
-    municipio: "",
-    fecha_alta: "",
-    historico: true,
-    lopd: false,
-    tipoCliente: "",
-  };
-};
-
-// Comprueba si las contraseñas coinciden
-const passwordMatch = computed(() => {
-  return (
-    (nuevoCliente.value.password || "") === (nuevoCliente.value.password2 || "")
-  );
-});
-
 // conversor fecha
+// Conversor de fechas (de dd/mm/yyyy a yyyy-mm-dd)
 function formatearFechaParaInput(fecha) {
   if (!fecha) return "";
 
@@ -944,6 +971,32 @@ function formatearFechaParaInput(fecha) {
   }
   return "";
 }
+
+// Limpia todos los campos del formulario
+const limpiarCampos = () => {
+  nuevoCliente.value = {
+    dni: "",
+    nombre: "",
+    apellidos: "",
+    email: "",
+    movil: "",
+    direccion: "",
+    provincia: "",
+    municipio: "",
+    fecha_alta: "",
+    historico: true,
+    lopd: false,
+    tipoCliente: "",
+  };
+  //Salimos del modo edición → el DNI vuelve a ser editable
+  editando.value = false;
+  clienteEditandoId.value = null;
+
+  // Opcional: limpiar validaciones visuales
+  dniValido.value = true;
+  emailValido.value = true;
+  movilValido.value = true;
+};
 </script>
 
 <style scoped>
@@ -965,5 +1018,20 @@ function formatearFechaParaInput(fecha) {
 
 .form-control {
   width: 100%;
+}
+
+.gestion-header {
+  /* Ocupa todo el ancho del contenedor */
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px 6px 6px 6px; /* opcional: redondeo en los bordes superiores */
+
+  background-color: #b5caff;
+  color: #03306b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
 }
 </style>

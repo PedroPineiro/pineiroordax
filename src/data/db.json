@@ -346,18 +346,19 @@
       "nombre": "Sonia",
       "apellidos": "Abalos Martínez",
       "eemail": "sonia@gmil.com",
-      "movil": "654789464",
+      "movil": "654789466",
       "direccion": "Avda. De Galicia, 101",
       "provincia": "Cuenca",
-      "municipio": "Acebrón, El",
+      "municipio": "",
       "fechaAlta": "2025-10-02",
       "historico": true,
       "email": "fdsfs@dfds.com",
       "lopd": true,
       "tipo": "user",
       "tipoCliente": "particular",
-      "password": "$2b$10$Au5TSqiULZfucUbSOgpcbOg3JiwI9LmBNHekRJlhlRw3VfCrnN9jK",
-      "password2": ""
+      "password": "abc123",
+      "password2": "",
+      "passwordConfirm": ""
     },
     {
       "id": "9afd",

@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <!-- Marca o logo -->
       <a class="navbar-brand d-flex align-items-center" href="/">
-        <img src="/logo.svg" alt="Logo Empresa Teis" class="brand-logo me-2" />
+        <img src="/logo.svg" alt="Logo EmpresaTeis" class="brand-logo me-2" />
       </a>
 
       <!-- Botón de hamburguesa en pantallas pequeñas -->
@@ -28,57 +28,64 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/">Inicio</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="isAdmin">
             <router-link class="nav-link" to="/clientes">Clientes</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/noticias">Noticias</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="isAdmin">
             <router-link class="nav-link" to="/modelos">Modelos</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/ventas">Ventas</router-link>
           </li>
+         <li class="nav-item" v-if="isAdmin">
+            <router-link class="nav-link" to="/taller">Taller</router-link>
+          </li>  
           <li class="nav-item">
-            <router-link class="nav-link" to="/listaModelos"
-              >Lista Modelos</router-link
-            >
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="#">Contacto</router-link>
+            <router-link class="nav-link" to="/contacto">Contacto</router-link>
           </li>
         </ul>
-      </div>
 
-      <!-- Dropdown de acceso/registro -->
-      <div class="dropdown ms-auto">
-        <span v-if="isLogueado" class="navbar-text me-2 text-white">{{ userName }}</span>
-        <button
-          class="btn btn-primary dropdown-toggle"
-          type="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <i class="bi bi-person fs-2"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <!-- Mostra “Acceso/Registro” se NON hai usuario logueado -->
-          <li v-if="!isLogueado">
-            <router-link class="dropdown-item" to="/login">Acceso</router-link>
-          </li>
-          <li v-if="!isLogueado">
-            <router-link class="dropdown-item" to="/clientes"
-              >Registro</router-link
-            >
-          </li>
-          <!-- Mostra “Cerrar Sesión” se está logueado -->
-          <li v-if="isLogueado">
-            <a class="dropdown-item" href="#" @click.prevent="logout"
-              >Cerrar Sesión</a
-            >
-          </li>
-        </ul>
+        <!-- Dropdown de acceso/registro -->
+        <div class="dropdown ms-auto">
+          <span v-if="!isLogueado" class="navbar-text me-2 text-white">{{
+            userName
+          }}</span>
+          <button
+            class="btn btn-primary dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bi bi-person fs-2"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <!-- Mostra "Acceso/Registro" se NON hai usuario logueado -->
+            <li v-if="!isLogueado">
+              <router-link class="dropdown-item" to="/login"
+                >Acceso</router-link
+              >
+            </li>
+            <li v-if="!isLogueado">
+              <router-link class="dropdown-item" to="/clientes"
+                >Registro</router-link
+              >
+            </li>
+            <!-- Mostra "Mi Perfil" y "Cerrar Sesión" se está logueado -->
+            <li v-if="isLogueado">
+              <router-link class="dropdown-item" to="/clientes"
+                >Mi Perfil</router-link
+              >
+            </li>
+            <li v-if="isLogueado">
+              <a class="dropdown-item" href="#" @click.prevent="logout"
+                >Cerrar Sesión</a
+              >
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>
@@ -95,21 +102,20 @@ const userName = ref("");
 
 // Cando o componente se monta, le localStorage (para cando montes a autenticación)
 onMounted(() => {
-  isLogueado.value = localStorage.getItem("isLogueado") === "true";
-  isAdmin.value = localStorage.getItem("isAdmin") === "true";
-  isUsuario.value = localStorage.getItem("isUsuario") === "true";
-  userName.value = localStorage.getItem("userName") || "";
+  isLogueado.value = sessionStorage.getItem("isLogueado") === "true";
+  isAdmin.value = sessionStorage.getItem("isAdmin") === "true";
+  isUsuario.value = sessionStorage.getItem("isUsuario") === "true";
+  userName.value = sessionStorage.getItem("userName") || "";
 });
 
 // Logout
 function logout() {
-  // Borra datos de sesión do localStorage
-  localStorage.removeItem("isLogueado");
-  localStorage.removeItem("userName");
-  localStorage.removeItem("isAdmin");
-  localStorage.removeItem("isUsuario");
-  localStorage.removeItem("token");
-
+  // Borra datos de sesión do sessionStorage
+  sessionStorage.removeItem("isLogueado");
+  sessionStorage.removeItem("userName");
+  sessionStorage.removeItem("isAdmin");
+  sessionStorage.removeItem("isUsuario");
+  sessionStorage.removeItem("token");
   // Actualiza estado
   isLogueado.value = false;
   userName.value = "";
@@ -128,9 +134,10 @@ function logout() {
 .navbar-dark .nav-link:focus {
   color: #fff; /* blanco intenso al pasar el ratón */
 }
+
 .brand-logo {
-  width: 70px;
-  height: 50px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
 }
 </style>

@@ -5,12 +5,14 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import authRoutes from "./authRoutes.js";
+import contactoRoutes from "./contactoRoutes.js";
 
 // a diferencia de json-server, aquí necesita configurar las rutas y controladores manualmente
 // json-server crea automáticamente las rutas basadas en el archivo JSON, mongoose requiere definir esquemas y modelos
 // MONGOSEE NO SABE NADA DE RUTAS CONTROLADRES Y MODELOS, HAY QUE CREARLOS MANUALMENTE
 
 import articulosRoutes from "./articulosRoutes.js"; // ruta al router backend
+import { soloAdmin, verificarToken } from "./authController.js";
 
 dotenv.config();
 const app = express();
@@ -20,21 +22,37 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Middleware
-app.use(cors()); // si no funciona lo siguiente
+// Middleware CORS - debe ir ANTES de las rutas
+const corsOptions = {
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Origin",
+    "X-Requested-With",
+    "Content-Type",
+    "Accept",
+    "Authorization",
+  ],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Rutas
+app.use("/api/auth", authRoutes);
+app.use("/api/contacto", contactoRoutes);
 
 // Rutas DE MONGOOSE, JSON SERVER NO ES NECESARIO LAS RUTAS LAS CREA AUTOMATICAMENTE
 // json-server es un backend ya construido.
 // Express es un backend que TÚ construyes.
 // Por eso json-server no requiere rutas y Express sí.
-
-app.use("/api/auth", authRoutes)
-
 app.use("/api/articulos", articulosRoutes);
 
 // Verificar variable
 //console.log("MONGODB_URI =", process.env.MONGODB_URI);
+
+app.use("/api/articulos", articulosRoutes, verificarToken, soloAdmin);
 
 /// Conexión a MongoDB
 mongoose

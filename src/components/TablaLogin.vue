@@ -26,7 +26,6 @@
             id="dni"
             class="form-control text-center"
             v-model="dni"
-            required
           />
         </div>
 
@@ -38,7 +37,6 @@
             id="pass"
             class="form-control"
             v-model="pass"
-            required
           />
         </div>
 
@@ -65,6 +63,7 @@
 
 import Swal from "sweetalert2";
 import { loginUsuario } from "@/api/authApi.js";
+import { jwtDecode } from "jwt-decode";
 
 export default {
   name: "TablaLogin",
@@ -72,23 +71,52 @@ export default {
     return {
       dni: "",
       pass: "",
+      errorMessage: "",
     };
   },
 
   methods: {
     async iniciarSesion() {
       try {
+        this.dni = this.dni.trim().toUpperCase();
+        this.pass = this.pass.trim();
+        if (this.dni === "" || this.pass === "") {
+          Swal.fire({
+            title: "Campos incompletos",
+            text: "Por favor, completa todos los campos.",
+            icon: "warning",
+            confirmButtonText: "Aceptar",
+          });
+          return;
+        }
+
         const data = await loginUsuario(this.dni, this.pass);
 
-        // Guardar token y datos del usuario en localStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userName", data.nombre);
-        localStorage.setItem("isLogueado", "true");
+        // Guardar token y datos del usuario en sessionStorage
+        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("userName", data.nombre);
+        sessionStorage.setItem("isLogueado", "true");
+
+        const decoded = jwtDecode(data.token);
+
+        if (decoded.tipo === "admin") {
+          sessionStorage.setItem("isAdmin", "true");
+          sessionStorage.setItem("userName", decoded.nombre);
+          sessionStorage.setItem("isUser", "false");
+        } else {
+          sessionStorage.setItem("isAdmin", "false");
+          sessionStorage.setItem("userName", decoded.nombre);
+          sessionStorage.setItem("isUser", "true");
+        }
 
         if (data.tipo === "admin") {
-          localStorage.setItem("isAdmin", "true");
+          sessionStorage.setItem("isAdmin", "true");
+          // Asegurar que la bandera de usuario normal queda desactivada
+          sessionStorage.setItem("isUsuario", "false");
         } else {
-          localStorage.setItem("isUsuario", "true");
+          sessionStorage.setItem("isUsuario", "true");
+          // Asegurar que la bandera admin queda desactivada
+          sessionStorage.setItem("isAdmin", "false");
         }
 
         Swal.fire({
