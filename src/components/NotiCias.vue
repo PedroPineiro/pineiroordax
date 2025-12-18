@@ -156,8 +156,9 @@ const checkAdmin = async () => {
 };
 
 onMounted(async () => {
-  await checkAdmin();
-  await loadNoticias();
+  const res = await fetch("http://localhost:3000/noticias");
+  noticias.value = await res.json();
+  isAdmin.value = sessionStorage.getItem("isAdmin") === "true";
 });
 
 const toggleExpand = (id) => {
