@@ -1,117 +1,108 @@
-  <template>
-  <div
-    class="container mx-auto mt-2 p-3 my-1 border rounded-0 shadow-sm bg-light"
-  >
-    <h3 class="text-center my-2">
-      <i class="bi bi-newspaper"> </i> Gestión de Noticias
-    </h3>
+<template>
+  <div class="bg-light min-vh-100">
+    <!-- Franja superior -->
+    <div class="bg-primary py-3 mb-4"></div>
 
-    <form v-if="isAdmin" @submit.prevent="agregarNoticia" class="mb-4">
-      <div class="mb-3 row align-items-center">
-        <div class="col-md-4 d-flex align-items-center">
-          <label for="titulo" class="form-label ms-3 mb-0 w-25">Título:</label>
-          <input
-            id="titulo"
-            v-model="nuevo.titulo"
-            type="text"
-            maxlength="128"
-            placeholder="Máximo 128 caracteres"
-            class="form-control flex-grow-1"
-          />
+    <div class="container">
+      <h2 class="text-center text-primary fw-bold my-4">
+        <i class="bi bi-newspaper"></i> Noticias
+      </h2>
+
+      <!-- Formulario (solo si es admin) -->
+      <div v-if="isAdmin" class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="titulo" class="form-label fw-bold">Título:</label>
+            <input
+              v-model="nuevo.titulo"
+              type="text"
+              id="titulo"
+              maxlength="128"
+              class="form-control"
+              placeholder="Introduce el título (máximo 128 caracteres)"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="contenido" class="form-label fw-bold">Contenido:</label>
+            <textarea
+              v-model="nuevo.contenido"
+              id="contenido"
+              maxlength="1024"
+              rows="4"
+              class="form-control"
+              placeholder="Escribe el contenido aquí... (máximo 1024 caracteres)"
+            ></textarea>
+          </div>
+
+          <div class="text-center">
+            <button
+              class="btn btn-outline-primary btn-sm fw-bold text-uppercase"
+              @click="agregarNoticia"
+            >
+              <i class="bi bi-plus-lg"></i> Publicar
+            </button>
+          </div>
         </div>
-        <div
-          class="col-md-4 ms-auto d-flex align-items-center justify-content-end"
-        >
+      </div>
+
+      <!-- Lista de noticias -->
+      <div v-if="noticias.length > 0" class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold">Últimas Noticias</h5>
           <small class="text-muted"
-            >Noticias guardadas: {{ noticias.length }}</small
+            >{{ noticias.length }} noticias guardadas</small
           >
         </div>
-      </div>
+        <hr />
 
-      <div class="mb-3 row">
-        <div class="d-flex align-items-start">
-          <label
-            for="contenido"
-            class="form-label mb-0 me-3"
-            style="width: 80px"
-            >Contenido:</label
-          >
-          <textarea
-            id="contenido"
-            v-model="nuevo.contenido"
-            maxlength="1024"
-            rows="4"
-            class="form-control flex-grow-1"
-            placeholder="Máximo 1024 caracteres"
-          ></textarea>
-        </div>
-      </div>
-
-      <div class="mb-3 d-flex justify-content-center">
-        <button type="submit" class="btn btn-outline-primary me-2">
-          <i class="bi bi-plus-lg"></i> Publicar
-        </button>
-      </div>
-    </form>
-
-    <!-- Lista de noticias en tabla (Bootstrap) -->
-    <div class="table-responsive">
-      <table class="table noticias-table mt-3">
-        <thead class="table-primary">
-          <tr>
-            <th>Título</th>
-            <th>Contenido</th>
-            <th style="width: 160px">Fecha</th>
-            <th v-if="isAdmin" style="width: 140px">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="noticia in noticias" :key="noticia.id">
-            <td class="align-middle">
-              <strong class="text-primary">{{ noticia.titulo }}</strong>
-            </td>
-            <td class="align-middle">
-              <div class="contenido">
-                <span v-if="isExpanded[noticia.id]">{{
-                  noticia.contenido
-                }}</span>
-                <span v-else>{{
-                  noticia.contenido.length > 200
-                    ? noticia.contenido.slice(0, 200) + "..."
-                    : noticia.contenido
-                }}</span>
-                <a
-                  href="#"
-                  @click.prevent="toggleExpand(noticia.id)"
-                  class="ms-2 text-decoration-none small"
-                >
-                  {{
-                    isExpanded[noticia.id] ? "Mostrar menos" : "Seguir leyendo"
-                  }}
-                </a>
-              </div>
-            </td>
-            <td class="align-middle">
+        <div
+          v-for="noticia in noticias"
+          :key="noticia.id"
+          class="card mb-3 shadow-sm border-0"
+        >
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="fw-bold mb-0 text-primary">{{ noticia.titulo }}</h6>
               <small class="text-muted">{{ noticia.fecha }}</small>
-            </td>
-            <td v-if="isAdmin" class="align-middle text-center">
+            </div>
+
+            <!-- Contenido con truncado -->
+            <p class="mb-3">
+              <span v-if="isExpanded[noticia.id]">{{ noticia.contenido }}</span>
+              <span v-else>{{
+                noticia.contenido.length > 200
+                  ? noticia.contenido.slice(0, 200) + "..."
+                  : noticia.contenido
+              }}</span>
               <button
-                @click="eliminarNoticia(noticia.id)"
-                class="btn btn-danger btn-sm me-2"
-                title="Eliminar Noticia"
+                v-if="noticia.contenido.length > 200"
+                class="btn btn-sm btn-link p-0 ms-1"
+                @click="toggleExpand(noticia.id)"
               >
-                <i class="bi bi-trash"></i>
+                {{ isExpanded[noticia.id] ? "Leer menos" : "Leer más" }}
               </button>
-            </td>
-          </tr>
-          <tr v-if="noticias.length === 0">
-            <td :colspan="isAdmin ? 4 : 3" class="text-center text-muted">
-              No hay noticias aún.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </p>
+
+            <div v-if="isAdmin" class="d-flex gap-2">
+              <button
+                class="btn btn-sm btn-outline-danger"
+                @click="eliminarNoticia(noticia.id)"
+              >
+                <i class="bi bi-trash"></i> Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="text-center text-muted py-5">
+        <p>No hay noticias disponibles.</p>
+      </div>
     </div>
+
+    <!-- Franja inferior -->
+    <div class="bg-primary py-3 mt-4"></div>
   </div>
 </template>
 
@@ -219,28 +210,34 @@ const editarNoticia = (id) => {
 </script>
 
 <style scoped>
-.form-table th {
-  vertical-align: middle;
-  width: 160px;
-  color: #2c3e50;
+.bg-primary {
+  background-color: #0d6efd !important;
 }
-.noticias-table tbody tr td {
-  vertical-align: middle;
+
+.card {
+  border-radius: 0.5rem;
+  transition: transform 0.2s;
 }
-.noticias-table .contenido {
-  max-width: 60ch;
-  word-wrap: break-word;
+
+.card:hover {
+  transform: translateY(-2px);
 }
-.noticias-table thead th {
-  font-weight: 700;
-}
-.noticias-table tbody tr:hover {
-  background: rgba(0, 0, 0, 0.03);
-}
+
 .btn i.bi {
   vertical-align: -0.125em;
 }
-.table .text-primary {
-  color: #0d6efd !important;
+
+.btn-link {
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+p {
+  line-height: 1.6;
+  word-wrap: break-word;
 }
 </style>
