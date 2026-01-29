@@ -34,15 +34,15 @@ const ArticuloSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    
+    // Nuevo campo para guardar la imagen
     imagen: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
   },
   {
     collection: "articulos",
-  }
+  },
 );
 
 export default mongoose.model("Articulo", ArticuloSchema);

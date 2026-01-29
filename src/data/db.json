@@ -484,6 +484,40 @@
       "lopd": true,
       "tipoCliente": "empresa",
       "tipo": "admin"
+    },
+    {
+      "id": "bcb1",
+      "dni": "39511864A",
+      "nombre": "Pedro",
+      "apellidos": "Piñeiro Ordax",
+      "email": "ppineiroordax@gmail.com",
+      "movil": "607527422",
+      "direccion": "Calle Teixugueiras 23",
+      "provincia": "Pontevedra",
+      "municipio": "Vigo",
+      "fechaAlta": "2026-01-23",
+      "historico": true,
+      "lopd": true,
+      "tipoCliente": "on",
+      "password": "$2b$10$viXtB3u4tDPY2wdaNgx7sOIRh601Az7Am/mCG6dZeCRQkRQ.4eAMC",
+      "passwordConfirm": "admin",
+      "tipo": "admin"
+    },
+    {
+      "id": "cd0f",
+      "dni": "99542610J",
+      "nombre": "Admin",
+      "apellidos": "Adminez",
+      "email": "admin@admin.com",
+      "movil": "909090909",
+      "direccion": "Calle Admingas",
+      "provincia": "Pontevedra",
+      "municipio": "Vigo",
+      "fechaAlta": "2026-01-21",
+      "historico": true,
+      "lopd": true,
+      "tipoCliente": "on",
+      "tipo":"admin"
     }
   ],
   "noticias": [

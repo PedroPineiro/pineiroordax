@@ -71,7 +71,9 @@ export default {
     return {
       dni: "",
       pass: "",
-      errorMessage: "",
+      dniError: "",
+      passError: "",
+      cargando: false,
     };
   },
 

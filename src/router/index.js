@@ -6,12 +6,17 @@ import NotiCias from "../components/NotiCias.vue";
 import AvisoLegal from "../components/AvisoLegal.vue";
 import PoliticaPrivacidad from "../components/PoliticaPrivacidad.vue";
 import ModeLos from "../components/ModeLos.vue";
+import PediDos from "../components/PediDos.vue";
 import ListaModelos from "../components/ListaModelos.vue";
 import ConTacto from "../components/ConTacto.vue";
 import CitasTaller from "../components/CitasTaller.vue";
 import TablaLogin from "../components/TablaLogin.vue";
 import VenTas from "../components/VenTas.vue";
+import BusCar from "../components/BusCar.vue";
 import { loginUsuario, esAdmin } from "../api/authApi";
+import CesTa from "../components/CesTa.vue";
+import TablaSuccess from "../components/TablaSuccess.vue";
+import TablaCanceL from "../components/TablaCanceL.vue";
 
 const routes = [
   {
@@ -46,6 +51,11 @@ const routes = [
     meta: { requiresAdmin: true },
   },
   {
+    path: "/pedidos",
+    name: "PediDos",
+    component: PediDos,
+  },
+  {
     path: "/listamodelos",
     name: "ListaModelos",
     component: ListaModelos,
@@ -68,13 +78,28 @@ const routes = [
   },
   {
     path: "/ventas",
-    name: VenTas,
+    name: "VenTas",
     component: VenTas,
   },
   {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: NotFound,
+  },
+  {
+    path: "/cesta",
+    name: "CesTa",
+    component: CesTa,
+  },
+  {
+    path: "/success",
+    name: "TablaSuccess",
+    component: TablaSuccess,
+  },
+  {
+    path: "/cancel",
+    name: "TablaCanceL",
+    component: TablaCanceL,
   },
 ];
 const router = createRouter({

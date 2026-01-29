@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <!-- Marca o logo -->
       <a class="navbar-brand d-flex align-items-center" href="/">
-        <img src="/logo.svg" alt="Logo EmpresaTeis" class="brand-logo me-2" />
+        <img src="../assets/logo.svg" alt="Logo EmpresaTeis" class="brand-logo me-2" />
       </a>
 
       <!-- Botón de hamburguesa en pantallas pequeñas -->
@@ -40,13 +40,54 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/ventas">Ventas</router-link>
           </li>
-         <li class="nav-item" v-if="isAdmin">
-            <router-link class="nav-link" to="/taller">Taller</router-link>
+          <!--          <li class="nav-item">
+            <router-link class="nav-link" to="/pedidos">Pedidos</router-link>
+          </li>
+          -->
+          <!--          <li class="nav-item">
+            <router-link class="nav-link" to="/listamodelos">Lista Modelos</router-link>
           </li>  
+          -->
+          <li class="nav-item" v-if="isAdmin">
+            <router-link class="nav-link" to="/taller">Taller</router-link>
+          </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/contacto">Contacto</router-link>
           </li>
         </ul>
+
+        <!-- BUSCADOR alineado a la derecha -->
+        <form
+          class="d-flex ms-auto me-2"
+          role="search"
+          @submit.prevent="buscar"
+        >
+          <input
+            class="form-control form-control-sm me-2 rounded-0"
+            type="search"
+            placeholder="Buscar..."
+            v-model="query"
+            style="width: 140px"
+          />
+          <button class="btn btn-light btn-s, rounded-0" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </form>
+
+        <!--CESTA DE LA COMPRA-->
+        <router-link
+          to="/cesta"
+          class="btn btn-primary position-relative ms-3 me-2"
+          title="Cesta"
+        >
+          <i class="bi bi-cart3 fs-4"></i>
+          <span
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+            v-if="cestaStore.totalItems > 0"
+          >
+            {{ cestaStore.totalItems }}
+          </span>
+        </router-link>
 
         <!-- Dropdown de acceso/registro -->
         <div class="dropdown ms-auto">
@@ -75,7 +116,7 @@
             </li>
             <!-- Mostra "Mi Perfil" y "Cerrar Sesión" se está logueado -->
             <li v-if="isLogueado">
-              <router-link class="dropdown-item" to="/clientes"
+              <router-link class="dropdown-item" to="/clientes?perfil=true"
                 >Mi Perfil</router-link
               >
             </li>
@@ -93,12 +134,20 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { esAdmin } from "@/api/authApi.js";
+import { useCestaStore } from "../store/cesta.js";
+
+const cestaStore = useCestaStore();
 
 // Estado do login
 const isLogueado = ref(false);
 const isAdmin = ref(false);
 const isUsuario = ref(false);
 const userName = ref("");
+
+const router = useRouter();
+const query = ref(""); // IMPORTANTE: esto evita el warning
 
 // Cando o componente se monta, le localStorage (para cando montes a autenticación)
 onMounted(() => {
@@ -123,6 +172,17 @@ function logout() {
   // Redirixe ao inicio recargando a páxina
   window.location.href = "/";
 }
+
+function buscar() {
+  if (!query.value.trim()) return;
+
+  router.push({
+    name: "Buscar",
+    query: { q: query.value.trim() },
+  });
+}
+
+query.value = ""; // optional: limpiar input despues de enviar
 </script>
 
 <style>

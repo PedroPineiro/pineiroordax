@@ -7,23 +7,15 @@ export const login = async (req, res) => {
 
   try {
     const response = await axios.get(
-      `http://localhost:3000/clientes?dni=${dni}`
+      `http://localhost:3000/clientes?dni=${dni}`,
     );
     const user = response.data[0];
 
     if (!user)
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      return res.status(400).json({ message: "Usuario no encontrado" });
 
-    // Verificación de contraseña con fallback para desarrollo
-    let ok = false;
-    if (user.password && user.password.startsWith("$2")) {
-      // Hash bcrypt
-      ok = await bcrypt.compare(password, user.password);
-    } else {
-      // Texto plano (solo desarrollo)
-      ok = password === user.password;
-    }
-
+    // importante : bcrypt.compare() hace internamente el hash de la password recibida y la compara con el hash almacenado
+    const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(400).json({ message: "Contraseña incorrecta" });
 
     const token = jwt.sign(
@@ -32,7 +24,7 @@ export const login = async (req, res) => {
         tipo: user.tipo || "user",
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "2h" },
     );
 
     res.json({ token, nombre: user.nombre, tipo: user.tipo || "user" });
