@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Stripe from "stripe";
 import authRoutes from "./authRoutes.js";
-import contactoRoutes from "./contactoRoutes.js";
+import contactoRoutes from "./contacto.js";
 
 // a diferencia de json-server, aquí necesita configurar las rutas y controladores manualmente
 // json-server crea automáticamente las rutas basadas en el archivo JSON, mongoose requiere definir esquemas y modelos
