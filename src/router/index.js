@@ -82,6 +82,11 @@ const routes = [
     component: VenTas,
   },
   {
+    path: "/buscar",
+    name: "BusCar",
+    component: BusCar,
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: NotFound,

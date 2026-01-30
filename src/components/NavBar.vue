@@ -177,12 +177,12 @@ function buscar() {
   if (!query.value.trim()) return;
 
   router.push({
-    name: "Buscar",
+    name: "BusCar",
     query: { q: query.value.trim() },
   });
+  query.value = ""; // optional: limpiar input despues de enviar
 }
 
-query.value = ""; // optional: limpiar input despues de enviar
 </script>
 
 <style>
