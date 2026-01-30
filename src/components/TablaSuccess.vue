@@ -30,7 +30,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import { useCestaStore } from "@/store/cesta.js";
-import logo from "../assets/logo.png"; // Logo de la empresa
+import logo from "@/assets/logo.png"; // Logo de la empresa
 
 const cesta = useCestaStore();
 const cartItems = ref([]);

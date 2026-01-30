@@ -5,19 +5,24 @@ import axios from "axios";
 const API_URL = "http://localhost:3000/clientes";
 
 // Función para obtener la lista de clientes desde la API
-
 export const getClientes = (mostrarHistorico) => {
-  let url = `${API_URL}?_sort=apellidos&_order=asc`;
+  let url = `${API_URL}`;
 
   if (!mostrarHistorico) {
-    // Solo clientes con histórico = true
-    url += `&historico=true`;
-  } else {
-    // Todos los clientes, sin filtrar por histórico
-    url += ``;
+    // Solo clientes activos (histórico = true)
+    url += `?historico=true`;
   }
+  // Si mostrarHistorico es true, traer todos sin filtrar
 
-  return axios.get(url).then((res) => res.data);
+  return axios.get(url).then((res) => {
+    // Ordenar por apellidos en el cliente
+    const datosOrdenados = res.data.sort((a, b) => {
+      const apellidoA = (a.apellidos || "").toLowerCase();
+      const apellidoB = (b.apellidos || "").toLowerCase();
+      return apellidoA.localeCompare(apellidoB);
+    });
+    return datosOrdenados;
+  });
 };
 
 // Función para agregar cliente nuevo

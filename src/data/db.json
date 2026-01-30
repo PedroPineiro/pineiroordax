@@ -349,16 +349,14 @@
       "movil": "654789466",
       "direccion": "Avda. De Galicia, 101",
       "provincia": "Cuenca",
-      "municipio": "",
+      "municipio": "Albendea",
       "fechaAlta": "2025-10-02",
       "historico": true,
       "email": "fdsfs@dfds.com",
       "lopd": true,
       "tipo": "user",
       "tipoCliente": "particular",
-      "password": "abc123",
-      "password2": "",
-      "passwordConfirm": ""
+      "password2": ""
     },
     {
       "id": "9afd",
@@ -447,11 +445,12 @@
       "email": "aldo@gao.es",
       "movil": "654213658",
       "direccion": "Calle Luna, 34",
-      "provincia": "Tarragona",
-      "municipio": "Calafell",
+      "provincia": "Lugo",
+      "municipio": "Castro de Rei",
       "fechaAlta": "2025-10-14",
       "historico": true,
-      "tipo": "user"
+      "tipo": "user",
+      "lopd": true
     },
     {
       "id": "9645",
@@ -464,7 +463,7 @@
       "provincia": "Pontevedra",
       "municipio": "Bueu",
       "fechaAlta": "2025-10-15",
-      "historico": false,
+      "historico": true,
       "tipo": "user"
     },
     {
@@ -517,7 +516,7 @@
       "historico": true,
       "lopd": true,
       "tipoCliente": "on",
-      "tipo":"admin"
+      "tipo": "admin"
     }
   ],
   "noticias": [

@@ -171,6 +171,7 @@
             v-model="nuevoCliente.direccion"
             @blur="capitalizarTexto('direccion')"
             class="form-control flex-grow-1"
+            placeholder="Calle, número, piso..."
           />
         </div>
 
@@ -228,7 +229,13 @@
             class="form-control flex-grow-1"
             :required="!editando"
             :disabled="editando && !esPerfilPropio"
-            :placeholder="editando && !esPerfilPropio ? 'No puede modificar password de otros usuarios' : 'Dejar vacío para no cambiar'"
+            :placeholder="
+              editando && !esPerfilPropio
+                ? '🔒 No puede modificar contraseña de otros usuarios'
+                : editando
+                  ? 'Dejar vacío para no cambiar'
+                  : 'Contraseña obligatoria'
+            "
           />
         </div>
 
@@ -249,7 +256,13 @@
             }"
             :required="!editando"
             :disabled="editando && !esPerfilPropio"
-            :placeholder="editando && !esPerfilPropio ? 'No puede modificar password de otros usuarios' : 'Dejar vacío para no cambiar'"
+            :placeholder="
+              editando && !esPerfilPropio
+                ? '🔒 No puede modificar contraseña de otros usuarios'
+                : editando
+                  ? 'Dejar vacío para no cambiar'
+                  : 'Confirme la contraseña'
+            "
           />
           <div
             v-if="
@@ -286,9 +299,11 @@
           id="historico"
           v-model="mostrarHistorico"
           class="form-check-input"
-          @change="cargarClientes"
+          @change="() => cargarClientes()"
         />
-        <label for="historico" class="form-check-label ms-2">Histórico</label>
+        <label for="historico" class="form-check-label ms-2"
+          >Mostrar todos (incluir inactivos)</label
+        >
       </div>
 
       <!-- Botones centrados -->
@@ -313,7 +328,13 @@
     </form>
     <!-- Lista de Clientes -->
     <div v-if="isAdmin" class="table-responsive">
-      <h4 class="text-center w-100">Listado Clientes</h4>
+      <h4 class="text-center w-100">
+        Listado Clientes
+        <small class="text-muted"
+          >({{ clientes.length }}
+          {{ mostrarHistorico ? "total (todos)" : "activo(s)" }})</small
+        >
+      </h4>
       <table
         class="table table-bordered table-striped table-hover table-sm w-100 align-middle"
       >
@@ -362,6 +383,17 @@
               >
                 <i class="bi bi-person-check"></i>
               </button>
+            </td>
+          </tr>
+          <tr v-if="clientes.length === 0">
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-2"></i>
+              <p class="mb-0 mt-2">No hay clientes para mostrar</p>
+              <small>{{
+                mostrarHistorico
+                  ? "No hay clientes en la base de datos"
+                  : "No hay clientes activos. Marca el checkbox para ver todos."
+              }}</small>
             </td>
           </tr>
         </tbody>
@@ -432,7 +464,7 @@ const nuevoCliente = ref({
 
 const editando = ref(false); // Modo edición activado o no
 const clienteEditandoId = ref(null); // ID del cliente que se está editando
-const mostrarHistorico = ref(false);
+const mostrarHistorico = ref(true); // true = todos los clientes, false = solo activos
 // Detectar si el usuario actual es admin (guardado en sessionStorage por el login)
 const isAdmin = ref(sessionStorage.getItem("isAdmin") === "true");
 // Controla si el usuario ha aceptado el Aviso Legal. Hasta que no sea true,
@@ -477,11 +509,11 @@ const cargarDatosSegunContexto = async () => {
       }
     }
   }
-  // Si es admin y NO viene de "Mi Perfil", mostrar el histórico completo
+  // Si es admin y NO viene de "Mi Perfil", mostrar TODOS los clientes por defecto
   else if (isAdmin.value) {
     limpiarCampos(); // Limpiar formulario antes de mostrar lista
-    mostrarHistorico.value = true;
-    cargarClientes();
+    mostrarHistorico.value = true; // true = mostrar TODOS (por defecto)
+    await cargarClientes();
     // No está viendo su propio perfil
     esPerfilPropio.value = false;
   }
@@ -522,7 +554,7 @@ watch(
       await cargarDatosSegunContexto();
       currentPage.value = 1;
     }
-  }
+  },
 );
 ///avanzar y retroceder
 
@@ -559,18 +591,22 @@ const totalPages = computed(() => {
   return Math.ceil(numClientes.value / clientesPorPage);
 });
 
-const cargarClientes = () => {
-  // llama a la API
-  getClientes(mostrarHistorico.value).then((data) => {
+const cargarClientes = async () => {
+  try {
+    // llama a la API y espera la respuesta
+    const data = await getClientes(mostrarHistorico.value);
     clientes.value = data;
     numClientes.value = data.length; // actualizar total de clientes
-  });
-  Swal.fire({
-    icon: "success",
-    title: "Listando Clientes",
-    showConfirmButton: false,
-    timer: 1500,
-  });
+  } catch (error) {
+    console.error("Error al cargar clientes:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error al cargar clientes",
+      text: "No se pudieron cargar los datos.",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  }
 };
 
 const guardarCliente = async () => {
@@ -599,8 +635,67 @@ const guardarCliente = async () => {
   }
 
   // Evita duplicados si estamos creando un nuevo cliente o editando
-  // Refrescar lista completa antes de validar
-  await cargarClientes();
+  // Refrescar lista completa antes de validar (cargar TODOS los clientes)
+  const todosClientes = await getClientes(true); // true = traer todos incluyendo inactivos
+
+  // Normalizar datos para comparación
+  const dniNormalizado = nuevoCliente.value.dni.trim().toUpperCase();
+  const emailNormalizado = nuevoCliente.value.email.trim().toLowerCase();
+  const movilNormalizado = nuevoCliente.value.movil.trim();
+
+  // Función para verificar duplicados y retornar mensaje específico
+  const verificarDuplicados = () => {
+    for (const cliente of todosClientes) {
+      // Si estamos editando, saltar el cliente actual
+      if (editando.value && cliente.id === clienteEditandoId.value) {
+        continue;
+      }
+
+      // Verificar DNI duplicado
+      if (cliente.dni && cliente.dni.trim().toUpperCase() === dniNormalizado) {
+        return {
+          duplicado: true,
+          campo: "DNI",
+          mensaje: `Ya existe un cliente con el DNI: ${dniNormalizado}`,
+        };
+      }
+
+      // Verificar email duplicado
+      if (
+        cliente.email &&
+        cliente.email.trim().toLowerCase() === emailNormalizado
+      ) {
+        return {
+          duplicado: true,
+          campo: "Email",
+          mensaje: `Ya existe un cliente con el email: ${emailNormalizado}`,
+        };
+      }
+
+      // Verificar móvil duplicado
+      if (cliente.movil && cliente.movil.trim() === movilNormalizado) {
+        return {
+          duplicado: true,
+          campo: "Móvil",
+          mensaje: `Ya existe un cliente con el teléfono móvil: ${movilNormalizado}`,
+        };
+      }
+    }
+
+    return { duplicado: false };
+  };
+
+  // Verificar duplicados
+  const resultadoValidacion = verificarDuplicados();
+  if (resultadoValidacion.duplicado) {
+    Swal.fire({
+      icon: "error",
+      title: `${resultadoValidacion.campo} duplicado`,
+      text: resultadoValidacion.mensaje,
+      showConfirmButton: true,
+    });
+    return;
+  }
 
   if (!editando.value) {
     // Al crear un nuevo cliente, la contraseña es obligatoria
@@ -610,43 +705,6 @@ const guardarCliente = async () => {
         title: "La contraseña es obligatoria",
         showConfirmButton: false,
         timer: 2000,
-      });
-      return;
-    }
-
-    // Verificar duplicados al crear
-    const duplicado = clientes.value.find(
-      (cliente) =>
-        cliente.dni === nuevoCliente.value.dni ||
-        cliente.movil === nuevoCliente.value.movil ||
-        cliente.email === nuevoCliente.value.email
-    );
-    if (duplicado) {
-      Swal.fire({
-        icon: "error",
-        title: "Datos duplicados",
-        text: "Ya existe un cliente con ese DNI, móvil o email.",
-        showConfirmButton: true,
-        timer: 3000,
-      });
-      return;
-    }
-  } else {
-    // Al editar, verificar que no haya duplicados con otros clientes (excluyendo el actual)
-    const duplicado = clientes.value.find(
-      (cliente) =>
-        cliente.id !== clienteEditandoId.value &&
-        (cliente.dni === nuevoCliente.value.dni ||
-          cliente.movil === nuevoCliente.value.movil ||
-          cliente.email === nuevoCliente.value.email)
-    );
-    if (duplicado) {
-      Swal.fire({
-        icon: "error",
-        title: "Datos duplicados",
-        text: "Ya existe otro cliente con ese DNI, móvil o email.",
-        showConfirmButton: true,
-        timer: 3000,
       });
       return;
     }
@@ -695,12 +753,12 @@ const guardarCliente = async () => {
       // Actualiza el cliente en la API
       const clienteActualizado = await updateCliente(
         clienteEditandoId.value,
-        datosCliente
+        datosCliente,
       );
 
       // Reemplaza el cliente modificado en la lista local
       const index = clientes.value.findIndex(
-        (c) => c.id === clienteEditandoId.value
+        (c) => c.id === clienteEditandoId.value,
       );
       if (index !== -1) clientes.value[index] = clienteActualizado;
       Swal.fire({
@@ -812,7 +870,7 @@ const eliminarCliente = async (movil) => {
   // Buscar cliente completo (que incluye el ID)
   // Busca el cliente por movil
   const clienteAEliminar = clientes.value.find(
-    (cliente) => cliente.movil === movil
+    (cliente) => cliente.movil === movil,
   );
 
   if (!clienteAEliminar) {
@@ -979,7 +1037,7 @@ const buscarClientePorMovil = async (movil) => {
   try {
     // Refrescar lista desde la API
     await cargarClientes();
-    
+
     // Buscar en la lista local
     const cliente = clientes.value.find((c) => c.movil === movil.trim());
 
@@ -1118,7 +1176,7 @@ const filtrarMunicipios = () => {
 
   // 3️⃣ filtrar los municipios cuyo id empiece por esos dos dígitos
   municipiosFiltrados.value = municipios.value.filter((m) =>
-    m.id.startsWith(codigoProv)
+    m.id.startsWith(codigoProv),
   );
 
   // 4️⃣ opcional: resetear el municipio si ya no corresponde
@@ -1200,12 +1258,12 @@ const limpiarCampos = () => {
   dniValido.value = true;
   emailValido.value = true;
   movilValido.value = true;
-  
+
   // Resetear checkbox de aviso legal (solo si no está logueado o es admin)
   if (isAdmin.value || !sessionStorage.getItem("token")) {
     avisoLegal.value = false;
   }
-  
+
   // Limpiar municipios filtrados
   municipiosFiltrados.value = [];
 };
@@ -1224,7 +1282,7 @@ const imprimirListado = () => {
 
   // Crear ventana de impresión
   const ventanaImpresion = window.open("", "_blank");
-  
+
   // Generar HTML para imprimir
   let htmlContent = `
     <!DOCTYPE html>
@@ -1267,7 +1325,7 @@ const imprimirListado = () => {
     </head>
     <body>
       <h1>Listado de Clientes</h1>
-      <p class="fecha-impresion">Fecha de impresión: ${new Date().toLocaleString('es-ES')}</p>
+      <p class="fecha-impresion">Fecha de impresión: ${new Date().toLocaleString("es-ES")}</p>
       <table>
         <thead>
           <tr>
@@ -1290,14 +1348,14 @@ const imprimirListado = () => {
     htmlContent += `
       <tr>
         <td>${index + 1}</td>
-        <td>${cliente.dni || ''}</td>
-        <td>${cliente.nombre || ''}</td>
-        <td>${cliente.apellidos || ''}</td>
-        <td>${cliente.email || ''}</td>
-        <td>${cliente.movil || ''}</td>
-        <td>${cliente.municipio || ''}</td>
-        <td>${cliente.provincia || ''}</td>
-        <td>${cliente.historico ? 'Activo' : 'Inactivo'}</td>
+        <td>${cliente.dni || ""}</td>
+        <td>${cliente.nombre || ""}</td>
+        <td>${cliente.apellidos || ""}</td>
+        <td>${cliente.email || ""}</td>
+        <td>${cliente.movil || ""}</td>
+        <td>${cliente.municipio || ""}</td>
+        <td>${cliente.provincia || ""}</td>
+        <td>${cliente.historico ? "Activo" : "Inactivo"}</td>
       </tr>
     `;
   });
@@ -1312,7 +1370,7 @@ const imprimirListado = () => {
   // Escribir contenido y lanzar impresión
   ventanaImpresion.document.write(htmlContent);
   ventanaImpresion.document.close();
-  
+
   // Esperar a que se cargue el contenido y luego imprimir
   ventanaImpresion.onload = () => {
     ventanaImpresion.print();
