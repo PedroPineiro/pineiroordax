@@ -456,6 +456,7 @@ const nuevoCliente = ref({
   fechaAlta: "",
   historico: false, // luego lo cambiamos a true
   lopd: false, // aceptación del aviso legal (L.O.P.D.)
+  tipoCliente: "",
   password: "",
   passwordConfirm: "",
 });

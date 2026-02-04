@@ -30,14 +30,16 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import { useCestaStore } from "@/store/cesta.js";
+import { addFactura } from "@/api/facturas.js";
 import logo from "@/assets/logo.png"; // Logo de la empresa
 
 const cesta = useCestaStore();
 const cartItems = ref([]);
 const totalPrice = ref(0);
+const numeroFactura = ref(Math.floor(Math.random() * 1000000));
 
 // Obtener los ítems del carrito desde localStorage (guardados antes del pago)
-onMounted(() => {
+onMounted(async () => {
   // Intentar recuperar los datos de la última compra desde localStorage
   const ultimaCompra = localStorage.getItem("ultimaCompra");
 
@@ -48,11 +50,13 @@ onMounted(() => {
 
     console.log("✅ Items recuperados de la compra:", cartItems.value);
     console.log("✅ Total de la compra:", totalPrice.value);
+    await guardarFacturaEnBD();
   } else if (cesta.items.length > 0) {
     // Fallback: si aún hay items en el store (no se vació)
     cartItems.value = JSON.parse(JSON.stringify(cesta.items));
     totalPrice.value = cesta.totalPrecio;
     console.log("✅ Items obtenidos del store:", cartItems.value);
+    await guardarFacturaEnBD();
   } else {
     console.warn("⚠️ No se encontraron datos de compra");
   }
@@ -60,6 +64,39 @@ onMounted(() => {
   // Vaciar el carrito ahora que ya tenemos los datos guardados
   cesta.clearCesta();
 });
+
+// Función para guardar la factura en la base de datos MongoDB
+const guardarFacturaEnBD = async () => {
+  try {
+    // Obtener información del usuario si está disponible
+    const usuario = sessionStorage.getItem("nombre") || "Cliente";
+
+    // Crear el objeto de factura para MongoDB
+    const factura = {
+      numeroFactura: numeroFactura.value,
+      fecha: new Date().toISOString(),
+      cliente: usuario,
+      items: cartItems.value.map((item) => ({
+        id: item.id,
+        nombre: item.nombre,
+        cantidad: item.cantidad,
+        precioUnitario: item.precio,
+        total: item.precio * item.cantidad,
+      })),
+      total: totalPrice.value,
+      estado: "Completado",
+    };
+
+    // Guardar en MongoDB (colección facturas)
+    const resultado = await addFactura(factura);
+    console.log(
+      "✅ Factura guardada en MongoDB (colección facturas):",
+      resultado,
+    );
+  } catch (error) {
+    console.error("❌ Error al guardar la factura en MongoDB:", error);
+  }
+};
 
 const generarFacturaPDF = () => {
   try {
@@ -81,6 +118,12 @@ const generarFacturaPDF = () => {
     // Título de la factura (a la derecha del logo)
     doc.setFontSize(18);
     doc.text("Factura de Compra", 50, 25);
+
+    doc.setFontSize(14);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 50, 34);
+
+    const numFactura = Math.floor(Math.random() * 1000000);
+    doc.text(`Nº Factura: ${numFactura}`, 50, 40);
 
     // Información del cliente
     doc.setFontSize(9);

@@ -88,13 +88,26 @@ const iniciarPago = async () => {
     return;
   }
 
+  const token = sessionStorage.getItem("token");
+  if (!token) {
+    mostrarAlerta(
+      "Autenticación requerida",
+      "Debes iniciar sesión para realizar el pago",
+      "error",
+    );
+    return;
+  }
+
   try {
     // GUARDAR los datos del carrito en localStorage ANTES de ir a Stripe
-    localStorage.setItem('ultimaCompra', JSON.stringify({
-      items: cesta.items,
-      total: cesta.totalPrecio,
-      fecha: new Date().toISOString()
-    }));
+    localStorage.setItem(
+      "ultimaCompra",
+      JSON.stringify({
+        items: cesta.items,
+        total: cesta.totalPrecio,
+        fecha: new Date().toISOString(),
+      }),
+    );
 
     // Crear la sesión de pago en el backend
     const response = await axios.post(
