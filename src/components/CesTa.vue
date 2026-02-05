@@ -7,6 +7,16 @@
     </div>
 
     <div v-else>
+      <!-- Alerta para usuarios no autenticados -->
+      <div v-if="!estaAutenticado" class="alert alert-warning text-center mb-4">
+        <h5>¡Inicia sesión para realizar tu compra!</h5>
+        <p class="mb-3">
+          Necesitas iniciar sesión o registrarte para continuar con el pago
+        </p>
+        <button class="btn btn-primary me-2" @click="irALogin">
+          Iniciar Sesión
+        </button>
+      </div>
       <table class="table">
         <thead>
           <tr>
@@ -70,8 +80,18 @@
 import { useCestaStore } from "@/store/cesta.js";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
 
 const cesta = useCestaStore();
+const router = useRouter();
+const estaAutenticado = ref(false);
+
+// Verificar si el usuario está autenticado
+onMounted(() => {
+  const token = sessionStorage.getItem("token");
+  estaAutenticado.value = !!token;
+});
 
 const incrementar = (id) => cesta.incrementar(id);
 const decrementar = (id) => cesta.decrementar(id);
@@ -79,6 +99,11 @@ const removeProducto = (id) => cesta.removeProducto(id);
 
 const mostrarAlerta = (title, text, icon) => {
   Swal.fire({ title, text, icon });
+};
+
+// Redirigir al login
+const irALogin = () => {
+  router.push("/login");
 };
 
 // Iniciar pago con Stripe usando axios

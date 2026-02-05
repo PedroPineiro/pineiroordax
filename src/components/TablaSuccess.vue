@@ -122,8 +122,7 @@ const generarFacturaPDF = () => {
     doc.setFontSize(14);
     doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 50, 34);
 
-    const numFactura = Math.floor(Math.random() * 1000000);
-    doc.text(`Nº Factura: ${numFactura}`, 50, 40);
+    doc.text(`Nº Factura: ${numeroFactura.value}`, 50, 40);
 
     // Información del cliente
     doc.setFontSize(9);
