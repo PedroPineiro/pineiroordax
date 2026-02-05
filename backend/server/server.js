@@ -16,15 +16,18 @@ import facturaRoutes from "./facturaRoutes.js";
 import articulosRoutes from "./articulosRoutes.js"; // ruta al router backend
 import { soloAdmin, verificarToken } from "./authController.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Leer .env desde la raíz del proyecto (2 niveles arriba)
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+
 const app = express();
 const PORT = process.env.PORT || 5000; // Use PORT from environment or default to 5000
 
 // Configuración de Stripe: carga de la clave secreta
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Middleware CORS - debe ir ANTES de las rutas

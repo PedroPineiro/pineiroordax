@@ -3,7 +3,11 @@
     <div class="container-fluid">
       <!-- Marca o logo -->
       <a class="navbar-brand d-flex align-items-center" href="/">
-        <img src="../assets/logo.svg" alt="Logo EmpresaTeis" class="brand-logo me-2" />
+        <img
+          src="../assets/logo.svg"
+          alt="Logo EmpresaTeis"
+          class="brand-logo me-2"
+        />
       </a>
 
       <!-- Botón de hamburguesa en pantallas pequeñas -->
@@ -136,7 +140,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { esAdmin } from "@/api/authApi.js";
-import { useCestaStore } from "../store/cesta.js";
+import { useCestaStore } from "@/store/cesta.js";
 
 const cestaStore = useCestaStore();
 
@@ -182,7 +186,6 @@ function buscar() {
   });
   query.value = ""; // optional: limpiar input despues de enviar
 }
-
 </script>
 
 <style>

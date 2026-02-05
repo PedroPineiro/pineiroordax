@@ -435,7 +435,7 @@ import {
   getClientePorDni,
 } from "@/api/clientes.js";
 import Swal from "sweetalert2";
-import AvisoLegal from "./AvisoLegal.vue";
+import AvisoLegal from "@/components/AvisoLegal.vue";
 import { jwtDecode } from "jwt-decode";
 
 // SCRIPTS CRUD //
